@@ -7,7 +7,7 @@
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS dla bezpośrednich połączeń P2P (WebRTC) -->
+  <!-- PeerJS dla połączeń P2P (WebRTC) -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -54,7 +54,7 @@
       <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 tracking-tight cursor-pointer" onclick="showView('view-mode-select')">
         🕵️ Kto To Jest?
       </h1>
-      <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej bez serwerów (P2P)</p>
+      <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej P2P</p>
     </header>
 
     <!-- WIDOK 1: WYBÓR TRYBU -->
@@ -280,8 +280,31 @@
           </div>
         </div>
 
-        <button onclick="nextRound()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-lg rounded-xl shadow-lg transition">
+        <button id="btn-next-round" onclick="nextRound()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-lg rounded-xl shadow-lg transition">
           Przejdź do Następnej Rundy ➔
+        </button>
+      </div>
+
+      <!-- EKRAN FINAŁOWY: PODIUM TOP 3 (KOMPUTER GŁÓWNY) -->
+      <div id="host-podium-modal" class="hidden glass-card p-6 md:p-10 rounded-3xl bg-slate-950/95 border-2 border-amber-400/80 space-y-8 text-center animate-success">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-widest text-amber-400 block mb-1">🎉 KONIEC TELETURNIEJU 🎉</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white">PODIUM ZWYCIĘZCÓW</h2>
+        </div>
+
+        <!-- STONIE PODIUM -->
+        <div id="podium-stairs" class="flex justify-center items-end gap-3 md:gap-6 pt-6 pb-2 min-h-[220px]">
+          <!-- Dynamicznie: Miejsce 2, Miejsce 1, Miejsce 3 -->
+        </div>
+
+        <!-- POZOSTAŁE MIEJSCA -->
+        <div class="space-y-3 text-left bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pozostałe Miejsca:</h4>
+          <div id="podium-others-list" class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs"></div>
+        </div>
+
+        <button onclick="location.reload()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-xl shadow-lg transition">
+          🔄 Zagraj Ponownie (Reset)
         </button>
       </div>
     </section>
@@ -386,6 +409,19 @@
           <div class="inline-block bg-slate-800 text-slate-400 px-3 py-1 rounded-lg text-xs font-bold border border-slate-700">
             +0 PKT
           </div>
+        </div>
+      </div>
+
+      <!-- EKRAN ZAKOŃCZENIA GRY NA TELEFONIE -->
+      <div id="player-final-screen" class="hidden glass-card p-6 rounded-3xl text-center space-y-4 bg-slate-900/90 border-2 border-amber-400/60 animate-success">
+        <div class="text-5xl" id="player-final-icon">🏆</div>
+        <h3 class="text-2xl font-black text-amber-300">KONIEC TELETURNIEJU!</h3>
+        <p class="text-sm text-slate-300">
+          Twój ostateczny wynik:<br>
+          <span id="player-final-score" class="text-3xl font-black text-emerald-400">0 pkt</span>
+        </p>
+        <div id="player-final-rank-badge" class="inline-block px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl font-bold text-slate-200 text-sm">
+          Miejsce w rankingu: #--
         </div>
       </div>
     </section>
@@ -574,7 +610,6 @@
       if (data.type === 'NEW_CARD_SUBMISSION') {
         const card = data.card;
         if (card && card.name) {
-          // Zastąp jeśli istnieje lub dodaj nową
           hostCards = hostCards.filter(c => c.name !== card.name);
           hostCards.push(card);
           renderHostCardsList();
@@ -792,11 +827,82 @@
     function nextRound() {
       playSound('click');
       currentRoundIndex++;
+      
       if (currentRoundIndex >= hostCards.length) {
-        alert('To była ostatnia runda! Dziękujemy za grę!');
-        currentRoundIndex = 0;
+        showFinalPodium();
+      } else {
+        setupHostRound();
       }
-      setupHostRound();
+    }
+
+    function showFinalPodium() {
+      playSound('win');
+      confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+
+      document.getElementById('host-reveal-modal').classList.add('hidden');
+      document.getElementById('host-podium-modal').classList.remove('hidden');
+
+      const sorted = [...hostPlayers].sort((a, b) => b.score - a.score);
+
+      const stairsContainer = document.getElementById('podium-stairs');
+      stairsContainer.innerHTML = '';
+
+      const p1 = sorted[0] || { name: '-', score: 0 };
+      const p2 = sorted[1] || { name: '-', score: 0 };
+      const p3 = sorted[2] || { name: '-', score: 0 };
+
+      stairsContainer.innerHTML = `
+        <!-- 2 MIEJSCE (SREBRO) -->
+        <div class="flex flex-col items-center flex-1 max-w-[120px]">
+          <span class="text-2xl mb-1">🥈</span>
+          <span class="font-bold text-slate-200 text-sm truncate w-full">${p2.name}</span>
+          <span class="text-xs text-amber-300 font-bold mb-2">${p2.score} pkt</span>
+          <div class="w-full bg-slate-800 border-t-4 border-slate-400 h-28 rounded-t-xl flex items-center justify-center font-black text-2xl text-slate-400">2</div>
+        </div>
+
+        <!-- 1 MIEJSCE (ZŁOTO) -->
+        <div class="flex flex-col items-center flex-1 max-w-[140px]">
+          <span class="text-4xl mb-1 animate-bounce">🥇</span>
+          <span class="font-black text-amber-300 text-base truncate w-full">${p1.name}</span>
+          <span class="text-sm text-emerald-400 font-black mb-2">${p1.score} pkt</span>
+          <div class="w-full bg-gradient-to-b from-amber-500 to-amber-700 border-t-4 border-amber-300 h-40 rounded-t-xl flex items-center justify-center font-black text-4xl text-slate-950 shadow-2xl">1</div>
+        </div>
+
+        <!-- 3 MIEJSCE (BRĄZ) -->
+        <div class="flex flex-col items-center flex-1 max-w-[120px]">
+          <span class="text-2xl mb-1">🥉</span>
+          <span class="font-bold text-amber-600 text-sm truncate w-full">${p3.name}</span>
+          <span class="text-xs text-amber-300 font-bold mb-2">${p3.score} pkt</span>
+          <div class="w-full bg-slate-900 border-t-4 border-amber-800 h-20 rounded-t-xl flex items-center justify-center font-black text-xl text-amber-700">3</div>
+        </div>
+      `;
+
+      const othersContainer = document.getElementById('podium-others-list');
+      const others = sorted.slice(3);
+      if (others.length > 0) {
+        othersContainer.innerHTML = others.map((p, idx) => `
+          <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+            <span class="font-semibold text-slate-300">${idx + 4}. ${p.name}</span>
+            <span class="font-bold text-amber-400">${p.score} pkt</span>
+          </div>
+        `).join('');
+      } else {
+        othersContainer.innerHTML = `<span class="text-slate-500 italic text-xs">Brak pozostałych graczy</span>`;
+      }
+
+      Object.keys(hostConnections).forEach(peerId => {
+        const conn = hostConnections[peerId];
+        const player = hostPlayers.find(p => p.id === peerId);
+        if (player) {
+          const rank = sorted.findIndex(p => p.name === player.name) + 1;
+          conn.send({
+            type: 'GAME_FINISHED',
+            rank: rank,
+            score: player.score,
+            totalPlayers: sorted.length
+          });
+        }
+      });
     }
 
     function broadcastGameState() {
@@ -869,6 +975,25 @@
         updatePlayerGameUI(data);
       } else if (data.type === 'ROUND_RESULT') {
         showPlayerRoundResult(data);
+      } else if (data.type === 'GAME_FINISHED') {
+        document.getElementById('player-voting-section').classList.add('hidden');
+        document.getElementById('player-voted-status').classList.add('hidden');
+        document.getElementById('player-round-result').classList.add('hidden');
+        
+        const finalScreen = document.getElementById('player-final-screen');
+        finalScreen.classList.remove('hidden');
+
+        document.getElementById('player-final-score').innerText = `${data.score} pkt`;
+        document.getElementById('player-final-rank-badge').innerText = `Twój wynik: #${data.rank} z ${data.totalPlayers} graczy`;
+
+        if (data.rank === 1) {
+          document.getElementById('player-final-icon').innerText = '🥇';
+          confetti({ particleCount: 150, spread: 80 });
+        } else if (data.rank === 2) {
+          document.getElementById('player-final-icon').innerText = '🥈';
+        } else if (data.rank === 3) {
+          document.getElementById('player-final-icon').innerText = '🥉';
+        }
       }
     }
 
