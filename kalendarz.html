@@ -23,7 +23,7 @@
         }
 
         .glass-panel {
-            background: rgba(30, 41, 59, 0.75);
+            background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -41,25 +41,6 @@
             box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3);
         }
 
-        /* 3D Card Flip */
-        .perspective-1000 {
-            perspective: 1000px;
-        }
-
-        .transform-style-3d {
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .backface-hidden {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
-
-        .rotate-y-180 {
-            transform: rotateY(180deg);
-        }
-
         @keyframes pulse-glow {
             0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); }
             50% { box-shadow: 0 0 40px rgba(168, 85, 247, 0.4); }
@@ -69,7 +50,7 @@
             animation: pulse-glow 3s infinite ease-in-out;
         }
 
-        /* Custom scrollbar for player vote grid */
+        /* Custom scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -122,7 +103,7 @@
                     </span>
                     <h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight">Jak Chcesz Zagrać?</h2>
                     <p class="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
-                        Jeden komputer/projektor wyświetla teleturniej, a gracze zgadują na telefonach w czasie rzeczywistym!
+                        Jeden komputer wyświetla teleturniej, a gracze zgadują na telefonach w czasie rzeczywistym!
                     </p>
                 </div>
 
@@ -134,7 +115,7 @@
                         </div>
                         <div>
                             <h3 class="text-lg font-extrabold text-white">1. KOMPUTER GŁÓWNY</h3>
-                            <p class="text-xs text-slate-400 mt-1">Prowadzący. Wpisujesz karty uczestników i prowadzić teleturniej.</p>
+                            <p class="text-xs text-slate-400 mt-1">Prowadzący. Wpisujesz karty uczestników i prowadzisz grających.</p>
                         </div>
                         <span class="inline-flex items-center text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition">
                             Utwórz Pokój ➡️
@@ -182,15 +163,15 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #1 (Trudny)</label>
+                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #1 (Trudny - 3 pkt)</label>
                             <input type="text" id="inputFact1" required placeholder="np. Spałem na lotnisku w Rzymie" class="w-full px-3.5 py-2 rounded-xl glass-input text-xs">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #2 (Średni)</label>
+                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #2 (Średni - 2 pkt)</label>
                             <input type="text" id="inputFact2" required placeholder="np. Umiem grać na skrzypcach" class="w-full px-3.5 py-2 rounded-xl glass-input text-xs">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #3 (Łatwy)</label>
+                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #3 (Łatwy - 1 pkt)</label>
                             <input type="text" id="inputFact3" required placeholder="np. Mam 3 rudy koty" class="w-full px-3.5 py-2 rounded-xl glass-input text-xs">
                         </div>
                     </div>
@@ -255,12 +236,12 @@
                 </div>
             </div>
 
-            <!-- Mystery Game Show 3D Card Container -->
-            <div class="perspective-1000 w-full min-h-[460px]">
-                <div id="gameFlipInner" class="transform-style-3d relative w-full h-full glass-panel rounded-3xl p-6 sm:p-10 border border-slate-700/60 shadow-2xl glow-card flex flex-col justify-between">
+            <!-- Main Teleturniej Panel -->
+            <div class="w-full min-h-[460px]">
+                <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-slate-700/60 shadow-2xl glow-card flex flex-col justify-between">
                     
-                    <!-- FRONT OF CARD: FACTS REVEAL -->
-                    <div id="hostCardFront" class="backface-hidden w-full flex flex-col justify-between space-y-6">
+                    <!-- QUESTION VIEW (BEFORE REVEAL) -->
+                    <div id="hostQuestionView" class="w-full flex flex-col justify-between space-y-6">
                         <div class="flex items-center justify-between border-b border-slate-800 pb-4">
                             <div>
                                 <span class="text-[10px] font-black uppercase tracking-widest text-indigo-400 block">Teleturniej Zgadywania</span>
@@ -311,38 +292,42 @@
                             </button>
 
                             <button onclick="hostGrandReveal()" class="w-full sm:flex-grow py-3.5 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 hover:from-amber-600 hover:via-orange-600 hover:to-pink-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-orange-500/25 transition transform active:scale-95 flex items-center justify-center gap-2">
-                                🎉 <span>Odkryj Kto To! (Koniec Zgadywania)</span>
+                                🎉 <span>Odkryj Kto To! (Rozstrzygnięcie)</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- BACK OF CARD: REVEALED AUTHOR & WINNERS -->
-                    <div id="hostCardBack" class="backface-hidden rotate-y-180 absolute inset-0 w-full h-full glass-panel rounded-3xl p-6 sm:p-10 border border-emerald-500/40 bg-slate-900/95 flex flex-col justify-between items-center text-center overflow-y-auto">
+                    <!-- REVEALED AUTHOR VIEW (CLEAN, ELEGANT REPLACEMENT FOR 3D FLIP) -->
+                    <div id="hostAnswerView" class="hidden w-full flex flex-col justify-between items-center text-center space-y-6 animate-fadeIn">
                         <div class="w-full flex items-center justify-between border-b border-slate-800 pb-3">
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Rozwiązanie Zagadki</span>
-                            <span class="text-xs text-slate-400">Odkryta Karta!</span>
+                            <span class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                                ✨ ROZWIAZANIE ZAGADKI
+                            </span>
+                            <span class="text-xs text-slate-400">Runda Zakwalifikowana</span>
                         </div>
 
-                        <div class="my-auto py-4 space-y-3">
-                            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-emerald-400 to-teal-500 text-slate-950 flex items-center justify-center font-black text-3xl sm:text-4xl mx-auto shadow-xl shadow-emerald-500/20 animate-bounce">
+                        <div class="my-auto py-6 space-y-4">
+                            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-emerald-400 via-teal-400 to-cyan-500 text-slate-950 flex items-center justify-center font-black text-5xl sm:text-6xl mx-auto shadow-2xl shadow-emerald-500/30 animate-bounce">
                                 👑
                             </div>
-                            <p class="text-xs font-semibold uppercase tracking-widest text-slate-400">To była karta osoby:</p>
-                            <h2 id="hostRevealedAuthorName" class="text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-400">
-                                ...
-                            </h2>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">To była karta osoby:</p>
+                                <h2 id="hostRevealedAuthorName" class="text-3xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 mt-1">
+                                    ...
+                                </h2>
+                            </div>
                         </div>
 
                         <!-- Winners List for this Round -->
                         <div class="w-full bg-slate-950/80 p-4 rounded-2xl border border-slate-800 text-left space-y-2">
                             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Osoby, które odgadły prawidłowo:</span>
-                            <div id="hostListRoundWinners" class="flex flex-wrap gap-2 max-h-28 overflow-y-auto">
+                            <div id="hostListRoundWinners" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                                 <!-- Dynamic Winners -->
                             </div>
                         </div>
 
                         <div class="w-full pt-4 border-t border-slate-800">
-                            <button onclick="hostNextCard()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition shadow-lg">
+                            <button onclick="hostNextCard()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black uppercase tracking-wider rounded-2xl transition shadow-xl">
                                 ➡️ Przejdź Do Następnej Karty
                             </button>
                         </div>
@@ -380,17 +365,17 @@
                     <!-- Room Code Entry -->
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                            1. Kod Pokoju (4 znaki)
+                            1. Kod Pokoju (4 cyfry)
                         </label>
                         <input type="text" id="playerRoomInput" maxlength="4" placeholder="np. 4A8B" class="w-full px-4 py-3 rounded-2xl glass-input text-xl font-mono font-black uppercase tracking-widest text-center">
                     </div>
 
                     <button onclick="playerConnectAndFetchNames()" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg transition flex items-center justify-center gap-2">
-                        🔍 <span>Połącz i Pobierz Graczy</span>
+                        🔍 <span>Połącz z Pokojem</span>
                     </button>
                 </div>
 
-                <!-- Step 2: Name Selection/Input (Appears after code match or directly) -->
+                <!-- Step 2: Name Selection/Input -->
                 <div id="playerNameSelectGroup" class="hidden pt-4 border-t border-slate-800 space-y-4">
                     <span class="block text-xs font-bold uppercase tracking-wider text-indigo-400">
                         2. Podaj Swoje Imię:
@@ -408,7 +393,7 @@
 
                     <!-- Option B: Text Input Field -->
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Wpisz ręcznie na klawiaturze:</label>
+                        <label class="block text-[11px] font-semibold text-slate-400 mb-1">Wpisz na klawiaturze:</label>
                         <input type="text" id="playerTextInputName" placeholder="Twój pseudonim / Imię..." class="w-full px-4 py-3 rounded-2xl glass-input text-sm font-bold">
                     </div>
 
@@ -418,7 +403,7 @@
                 </div>
             </div>
 
-            <!-- STEP 3B: PLAYER LIVE GAMEPLAY SCREEN (FULLY REDESIGNED FOR PHONE) -->
+            <!-- STEP 3B: PLAYER LIVE GAMEPLAY SCREEN (PHONE OPTIMIZED) -->
             <div id="playerStepGame" class="hidden glass-panel rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 border border-slate-700/60">
                 
                 <!-- Header -->
@@ -465,13 +450,13 @@
                     </div>
                 </div>
 
-                <!-- VOTING SECTION: BIG TOUCH TILES FOR PHONE -->
+                <!-- VOTING SECTION: TOUCH TILES FOR PHONE -->
                 <div id="playerVoteSection" class="space-y-2.5">
                     <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-200">
                         Kto Twoim zdaniem to napisał? Kliknij poniżej:
                     </label>
 
-                    <div id="playerGuessList" class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto p-1">
+                    <div id="playerGuessList" class="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto p-1">
                         <!-- Candidate Tiles generated dynamically -->
                     </div>
 
@@ -487,8 +472,8 @@
                     <p class="text-xs text-slate-300">Możesz zmienić swój typ wyżej lub czekać na rozstrzygnięcie Prowadzącego.</p>
                 </div>
 
-                <!-- Round Result Announcement -->
-                <div id="playerRoundResult" class="hidden p-4 rounded-2xl text-center space-y-2 my-2">
+                <!-- AUTOMATIC ROUND RESULT ANNOUNCEMENT ON PHONE -->
+                <div id="playerRoundResult" class="hidden p-5 rounded-2xl text-center space-y-2 my-2 shadow-2xl transition-all">
                     <!-- Dynamic Result: Correct or Incorrect -->
                 </div>
             </div>
@@ -521,14 +506,14 @@
         // Host Game State
         let currentCardIndex = 0;
         let currentRevealedFacts = 1;
-        let isCardFlipped = false;
+        let isAnswerRevealed = false;
         let playerVotes = {}; // { playerName: { guessName, factStepWhenVoted } }
         let globalScores = {}; // { playerName: totalPoints }
 
         // Player Specific State
         let myPlayerName = "";
         let mySelectedGuess = null;
-        let hasVotedCurrentRound = false;
+        let myCurrentScore = 0;
 
         /* ==================== WEB AUDIO SYNTHESIZER ==================== */
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -576,6 +561,18 @@
                         o.start(now + idx * 0.09);
                         o.stop(now + idx * 0.09 + 0.4);
                     });
+                } else if (type === 'wrong') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
                 }
             } catch (e) {
                 console.log("Audio API unavailable");
@@ -734,7 +731,7 @@
                             fact1: current.fact1,
                             fact2: current.fact2,
                             fact3: current.fact3,
-                            isFlipped: isCardFlipped
+                            isAnswerRevealed: isAnswerRevealed
                         }
                     });
                 });
@@ -777,13 +774,15 @@
 
             // Reset Round States
             currentRevealedFacts = 1;
-            isCardFlipped = false;
+            isAnswerRevealed = false;
             playerVotes = {};
 
             updateFactRevealBoxesUI();
             updateHostVotesCounter();
 
-            document.getElementById('gameFlipInner').classList.remove('rotate-y-180');
+            // Show question view, hide answer view
+            document.getElementById('hostQuestionView').classList.remove('hidden');
+            document.getElementById('hostAnswerView').classList.add('hidden');
 
             // Broadcast state to all connected phones
             broadcastToPlayers({
@@ -794,7 +793,7 @@
                 fact1: current.fact1,
                 fact2: current.fact2,
                 fact3: current.fact3,
-                isFlipped: false
+                isAnswerRevealed: false
             });
         }
 
@@ -851,19 +850,20 @@
         }
 
         function hostGrandReveal() {
-            if (isCardFlipped) return;
-            isCardFlipped = true;
+            if (isAnswerRevealed) return;
+            isAnswerRevealed = true;
 
-            const flipInner = document.getElementById('gameFlipInner');
-            flipInner.classList.add('rotate-y-180');
+            // Switch to clean answer view
+            document.getElementById('hostQuestionView').classList.add('hidden');
+            document.getElementById('hostAnswerView').classList.remove('hidden');
 
             playSound('fanfare');
-            confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
+            confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
 
             const currentAuthor = participantsData[currentCardIndex].name;
             const roundWinners = [];
 
-            // Calculate score points
+            // Calculate score points for all players
             Object.entries(playerVotes).forEach(([voterName, voteInfo]) => {
                 if (voteInfo.guessName.toLowerCase().trim() === currentAuthor.toLowerCase().trim()) {
                     let pts = 1;
@@ -875,7 +875,7 @@
                 }
             });
 
-            // Render Round Winners List
+            // Render Round Winners List on Host Screen
             const winnersContainer = document.getElementById('listHostRoundWinners');
             winnersContainer.innerHTML = '';
 
@@ -892,11 +892,12 @@
 
             renderGlobalScoreboard();
 
-            // Broadcast Reveal result to phones
+            // Broadcast Reveal result & updated scores to ALL PHONES
             broadcastToPlayers({
                 type: 'GRAND_REVEAL',
                 correctAuthor: currentAuthor,
-                roundWinners: roundWinners
+                roundWinners: roundWinners,
+                globalScores: globalScores
             });
         }
 
@@ -1014,7 +1015,6 @@
                 }
 
             } else if (data.type === 'ROUND_STATE') {
-                hasVotedCurrentRound = false;
                 mySelectedGuess = null;
 
                 document.getElementById('playerVoteSection').classList.remove('hidden');
@@ -1140,8 +1140,6 @@
             if (!mySelectedGuess) return;
             playSound('click');
 
-            hasVotedCurrentRound = true;
-
             if (playerConn) {
                 playerConn.send({
                     type: 'SUBMIT_VOTE',
@@ -1156,6 +1154,7 @@
         }
 
         function renderPlayerRoundResultUI(data) {
+            // Hide active voting section and confirmation box
             document.getElementById('playerVoteSection').classList.add('hidden');
             document.getElementById('playerVoteConfirmed').classList.add('hidden');
 
@@ -1165,31 +1164,44 @@
             const isWinner = data.roundWinners.some(w => w.name === myPlayerName);
             const myWinObj = data.roundWinners.find(w => w.name === myPlayerName);
 
+            // Update my current score from broadcasted global score table
+            if (data.globalScores && data.globalScores[myPlayerName] !== undefined) {
+                myCurrentScore = data.globalScores[myPlayerName];
+                document.getElementById('playerScoreDisplay').innerText = `${myCurrentScore} pkt`;
+            }
+
             if (isWinner) {
                 playSound('fanfare');
-                confetti({ particleCount: 90, spread: 70, origin: { y: 0.7 } });
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
 
-                resContainer.className = "p-5 rounded-2xl bg-emerald-950/90 border border-emerald-500/50 text-center space-y-2 shadow-xl";
+                resContainer.className = "p-5 rounded-2xl bg-emerald-950/90 border border-emerald-500/50 text-center space-y-3 shadow-xl";
                 resContainer.innerHTML = `
-                    <span class="text-3xl">🎉</span>
-                    <h3 class="text-lg font-black text-emerald-300">BRAWO! ZGADŁEŚ(-AŚ)!</h3>
-                    <p class="text-xs text-slate-200">To była karta osoby: <strong class="text-white font-extrabold">${escapeHTML(data.correctAuthor)}</strong></p>
-                    <div class="inline-block px-3 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">
-                        +${myWinObj.pts} pkt
+                    <span class="text-4xl block">🎉</span>
+                    <h3 class="text-lg font-black text-emerald-300">SUKCES! ZGADŁEŚ(-AŚ)!</h3>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        To rzeczywiście była karta osoby: <strong class="text-white font-black text-sm block mt-0.5">${escapeHTML(data.correctAuthor)}</strong>
+                    </p>
+                    <div class="inline-block px-4 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 font-extrabold text-xs border border-emerald-500/40">
+                        +${myWinObj.pts} pkt za tę rundę!
                     </div>
                 `;
 
-                // Update my score display
-                const scoreEl = document.getElementById('playerScoreDisplay');
-                let currentPts = parseInt(scoreEl.innerText) || 0;
-                scoreEl.innerText = `${currentPts + myWinObj.pts} pkt`;
-
             } else {
-                resContainer.className = "p-5 rounded-2xl bg-rose-950/90 border border-rose-500/50 text-center space-y-2 shadow-xl";
+                playSound('wrong');
+
+                const myGuessText = mySelectedGuess ? `Twój typ: <strong>${escapeHTML(mySelectedGuess)}</strong>` : `Nie oddałeś(-aś) głosu w tej rundzie.`;
+
+                resContainer.className = "p-5 rounded-2xl bg-rose-950/90 border border-rose-500/50 text-center space-y-3 shadow-xl";
                 resContainer.innerHTML = `
-                    <span class="text-3xl">😅</span>
-                    <h3 class="text-lg font-black text-rose-300">NIESTETY, PUDŁO!</h3>
-                    <p class="text-xs text-slate-200">To była karta osoby: <strong class="text-rose-200 font-extrabold">${escapeHTML(data.correctAuthor)}</strong></p>
+                    <span class="text-4xl block">😅</span>
+                    <h3 class="text-lg font-black text-rose-300">NIESTETY! PUDŁO</h3>
+                    <p class="text-xs text-slate-200 leading-relaxed">
+                        ${myGuessText}<br>
+                        A to była karta osoby: <strong class="text-white font-black text-sm block mt-1">${escapeHTML(data.correctAuthor)}</strong>
+                    </p>
+                    <div class="inline-block px-3 py-1 rounded-xl bg-rose-500/20 text-rose-300 font-bold text-xs border border-rose-500/30">
+                        0 pkt w tej rundzie
+                    </div>
                 `;
             }
         }
