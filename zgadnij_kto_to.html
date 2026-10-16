@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kto to jest? — Karta Tajemnic</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PeerJS dla połączeń P2P (WebRTC) -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- FontAwesome Ikony -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    @keyframes pulse-success {
+      0% { transform: scale(0.85); opacity: 0; }
+      50% { transform: scale(1.08); }
+      70% { transform: scale(0.98); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes shake-fail {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+    .animate-success {
+      animation: pulse-success 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .animate-fail {
+      animation: shake-fail 0.5s ease-in-out forwards;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .glow-green {
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+    }
+    .glow-red {
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-white min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
+
+  <div id="app" class="max-w-4xl mx-auto p-4 md:p-6 min-h-screen flex flex-col justify-between">
+
+    <!-- NAGŁÓWEK -->
+    <header class="text-center py-4 border-b border-slate-800 mb-6">
+      <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 tracking-tight cursor-pointer" onclick="showView('view-mode-select')">
+        🕵️ Kto To Jest?
+      </h1>
+      <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej P2P</p>
+    </header>
+
+    <!-- WIDOK 1: WYBÓR TRYBU -->
+    <main id="view-mode-select" class="space-y-6 my-auto">
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl font-bold">Wybierz opcję:</h2>
+        <p class="text-slate-400 text-sm">Prowadzący tworzy pokój na komputerze, a pozostali wysyłają swoje karty i zgadują na telefonach!</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <!-- Opcja 1: Komputer Główny -->
+        <button onclick="selectRole('host')" class="group p-6 rounded-3xl bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 hover:border-indigo-400 transition text-left hover:scale-[1.02] shadow-xl">
+          <div class="text-3xl mb-2">💻</div>
+          <h3 class="text-xl font-bold text-white group-hover:text-indigo-300">1. Komputer Główny</h3>
+          <p class="text-indigo-200/70 text-xs mt-2">Dla Prowadzącego. Generuje Kod Pokoju i odbiera karty graczy na żywo.</p>
+        </button>
+
+        <!-- Opcja 2: Tworzenie Karty -->
+        <button onclick="selectRole('creator')" class="group p-6 rounded-3xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 border border-amber-500/30 hover:border-amber-400 transition text-left hover:scale-[1.02] shadow-xl">
+          <div class="text-3xl mb-2">📝</div>
+          <h3 class="text-xl font-bold text-white group-hover:text-amber-300">2. Stwórz swoją kartę</h3>
+          <p class="text-amber-200/70 text-xs mt-2">Dla uczestników. Wpisz swoje imię, 3 tajemnicze fakty i wyślij prosto na komputer.</p>
+        </button>
+
+        <!-- Opcja 3: Telefon Dołącz -->
+        <button onclick="selectRole('player')" class="group p-6 rounded-3xl bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border border-emerald-500/30 hover:border-emerald-400 transition text-left hover:scale-[1.02] shadow-xl">
+          <div class="text-3xl mb-2">📱</div>
+          <h3 class="text-xl font-bold text-white group-hover:text-emerald-300">3. Telefon (Gra)</h3>
+          <p class="text-emerald-200/70 text-xs mt-2">Dla graczy w trakcie turnieju. Oglądaj podpowiedzi i typuj na żywo na ekranie.</p>
+        </button>
+      </div>
+    </main>
+
+
+    <!-- ============================================================================================== -->
+    <!-- WIDOK CREATORA: WYSYŁANIE KARTY BEZPOŚREDNIO P2P DO KOMPUTERA -->
+    <!-- ============================================================================================== -->
+    <section id="view-card-creator" class="hidden space-y-5 my-auto max-w-lg mx-auto w-full">
+      <div class="glass-card p-6 rounded-3xl space-y-4 border border-amber-500/30">
+        <div class="text-center">
+          <h2 class="text-2xl font-bold text-amber-400">📝 Stwórz i Wyślij Kartę</h2>
+          <p class="text-slate-400 text-xs mt-1">Wpisz prawdę o sobie i wyślij bezpośrednio do Prowadzącego!</p>
+        </div>
+
+        <form onsubmit="submitCardDirectP2P(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Kod Pokoju (4 cyfry z komputera Prowadzącego)</label>
+            <input id="create-room-code" type="text" maxlength="6" placeholder="np. 4821" required class="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-4 py-2.5 text-amber-300 font-mono font-bold tracking-widest focus:outline-none uppercase text-center text-xl">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Twoje Imię / Nick</label>
+            <input id="create-name" type="text" placeholder="np. Kasia" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #1</label>
+            <input id="create-fact1" type="text" placeholder="np. Spałam kiedyś na lotnisku" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #2</label>
+            <input id="create-fact2" type="text" placeholder="np. Umiem lutować elektronikę" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #3</label>
+            <input id="create-fact3" type="text" placeholder="np. Chcę odwiedzić Japonię" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <button id="btn-submit-card-p2p" type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-lg rounded-2xl shadow-xl transition transform active:scale-95">
+            🚀 Wyślij bezpośrednio do Prowadzącego
+          </button>
+        </form>
+
+        <div id="creator-status-msg" class="hidden p-4 rounded-2xl text-center space-y-1">
+          <p id="creator-status-text" class="font-bold text-sm">...</p>
+        </div>
+
+        <div class="pt-2 border-t border-slate-800 text-center">
+          <button onclick="copyCardCodeToClipboard()" class="text-xs text-slate-400 hover:text-amber-300 underline">
+            📋 Lub skopiuj kod tekstowy (do przesłania na czacie)
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================================================== -->
+    <!-- WIDOKI PROWADZĄCEGO (HOST / KOMPUTER) -->
+    <!-- ============================================================================================== -->
+    <section id="view-host-setup" class="hidden space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold text-indigo-400">Panel Prowadzącego</h2>
+          <p class="text-slate-400 text-xs">Utwórz pokój, a gracze wyślą swoje karty ze swoich telefonów na żywo!</p>
+        </div>
+        <button onclick="loadSampleData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition">
+          ⚡ Załaduj przykładowe karty
+        </button>
+      </div>
+
+      <!-- TWORZENIE POKOJU -->
+      <div id="host-init-container" class="glass-card p-6 rounded-2xl text-center space-y-4">
+        <h3 class="font-bold text-lg text-slate-200">Krok 1: Aktywuj Pokój Do Odbierania Kart</h3>
+        <p class="text-slate-400 text-xs">Uruchom połączenie, aby gracze mogli wysyłać karty podając Twój Kod Pokoju.</p>
+        <button onclick="initHostRoom()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition">
+          📡 Aktywuj Pokój i Generuj Kod
+        </button>
+      </div>
+
+      <!-- KOD POKOJU DLA GRACZY -->
+      <div id="host-room-info-box" class="hidden glass-card p-5 rounded-2xl space-y-3 text-center border border-emerald-500/40 bg-emerald-950/20">
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Pokój Otwarty &bull; Podaj ten kod graczom:</span>
+        <div id="host-room-code-display" class="text-5xl font-black text-amber-400 tracking-wider font-mono">
+          ----
+        </div>
+        <p class="text-xs text-slate-300">Gracze wchodzą w zakładkę <b>„2. Stwórz swoją kartę”</b> i wpisują ten kod na telefonie.</p>
+      </div>
+
+      <!-- AWARYJNE PASTE Z CZATU -->
+      <details class="glass-card p-4 rounded-2xl text-xs text-slate-300">
+        <summary class="font-bold cursor-pointer text-slate-300 hover:text-white">📋 Masz kody skopiowane z czatu? Wklej je tutaj</summary>
+        <div class="space-y-2 mt-3 pt-3 border-t border-slate-800">
+          <textarea id="host-batch-paste-input" rows="3" placeholder="Wklej wiadomości z czatu (np. KARTA#Kasia#Fakt1|Fakt2|Fakt3)..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"></textarea>
+          <button onclick="parseBatchPastedCards()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700">
+            Załaduj wklejone karty
+          </button>
+        </div>
+      </details>
+
+      <!-- Lista odbieranych kart -->
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="font-bold text-slate-300">Odebrane Karty (<span id="host-card-count">0</span>):</h3>
+          <button onclick="clearAllCards()" class="text-xs text-rose-400 hover:underline">Wyczyść listę</button>
+        </div>
+        <div id="host-card-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+          <!-- Karty z telefonów wskakują tu dynamicznie -->
+        </div>
+      </div>
+
+      <!-- Rozpocznij grę -->
+      <div class="pt-4 border-t border-slate-800 text-center">
+        <button id="btn-start-show" onclick="startHostGame()" disabled class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-2xl shadow-xl transition transform active:scale-95 disabled:opacity-30">
+          🎬 Rozpocznij Teleturniej!
+        </button>
+      </div>
+    </section>
+
+    <!-- HOST STEP 2: EKRAN TELETIURNIEJU (GRA NA ŻYWO) -->
+    <section id="view-host-game" class="hidden space-y-6">
+      <div class="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
+        <div>
+          <span id="host-round-badge" class="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/30">Runda 1 / 20</span>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-400 block">Oddano głosów na telefonach:</span>
+          <span id="host-votes-count" class="text-lg font-bold text-emerald-400">0 / 0</span>
+        </div>
+      </div>
+
+      <!-- KARTA TAJEMNICZEJ OSOBY -->
+      <div class="glass-card p-6 md:p-8 rounded-3xl space-y-6 border border-indigo-500/20 relative overflow-hidden">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+          <h2 id="host-mystery-title" class="text-2xl font-bold text-amber-300">❓ Tajemnicza Osoba #1</h2>
+          <span class="text-xs text-slate-400">Zagadka dla grupy</span>
+        </div>
+
+        <div class="space-y-4">
+          <div id="fact-box-1" class="p-4 rounded-xl bg-slate-900 border border-slate-800 transition-all">
+            <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider block mb-1">Fakt #1</span>
+            <p id="fact-text-1" class="text-lg md:text-xl font-medium text-white">...</p>
+          </div>
+
+          <div id="fact-box-2" class="p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all">
+            <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider block mb-1">Fakt #2</span>
+            <p id="fact-text-2" class="text-lg md:text-xl font-medium text-slate-400">🔒 [Zablokowany]</p>
+          </div>
+
+          <div id="fact-box-3" class="p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all">
+            <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider block mb-1">Fakt #3</span>
+            <p id="fact-text-3" class="text-lg md:text-xl font-medium text-slate-400">🔒 [Zablokowany]</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button id="btn-reveal-fact-2" onclick="revealFact(2)" class="py-3 bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold rounded-xl border border-indigo-500/30 transition disabled:opacity-30">
+            🔓 Odsłoń Fakt #2
+          </button>
+          <button id="btn-reveal-fact-3" onclick="revealFact(3)" class="py-3 bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold rounded-xl border border-indigo-500/30 transition disabled:opacity-30" disabled>
+            🔓 Odsłoń Fakt #3
+          </button>
+        </div>
+
+        <button id="btn-reveal-answer" onclick="revealAnswer()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xl rounded-2xl shadow-xl transition transform active:scale-95">
+          🎉 ODKRYJ KTO TO!
+        </button>
+      </div>
+
+      <!-- WIDOK POPRAWNEJ ODPOWIEDZI -->
+      <div id="host-reveal-modal" class="hidden glass-card p-6 md:p-8 rounded-3xl bg-slate-900/95 border-2 border-amber-400/50 space-y-6">
+        <div class="text-center space-y-2">
+          <span class="text-xs uppercase font-bold tracking-widest text-amber-400">Tajemniczą Osobą Był(a):</span>
+          <h2 id="host-revealed-name" class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-100 to-amber-400">
+            ---
+          </h2>
+        </div>
+
+        <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-3">
+          <h3 class="font-bold text-emerald-400 text-sm uppercase tracking-wider">
+            🎯 Osoby, które odpowiedziały poprawnie (+1 PKT):
+          </h3>
+          <div id="host-correct-players-list" class="flex flex-wrap gap-2">
+            <!-- Imiona wygranych -->
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Aktualny Ranking Punktowy:</h3>
+          <div id="host-leaderboard" class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+            <!-- Ranking -->
+          </div>
+        </div>
+
+        <button id="btn-next-round" onclick="nextRound()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-lg rounded-xl shadow-lg transition">
+          Przejdź do Następnej Rundy ➔
+        </button>
+      </div>
+
+      <!-- EKRAN FINAŁOWY: PODIUM TOP 3 (KOMPUTER GŁÓWNY) -->
+      <div id="host-podium-modal" class="hidden glass-card p-6 md:p-10 rounded-3xl bg-slate-950/95 border-2 border-amber-400/80 space-y-8 text-center animate-success">
+        <div>
+          <span class="text-xs uppercase font-bold tracking-widest text-amber-400 block mb-1">🎉 KONIEC TELETURNIEJU 🎉</span>
+          <h2 class="text-4xl md:text-5xl font-black text-white">PODIUM ZWYCIĘZCÓW</h2>
+        </div>
+
+        <!-- STONIE PODIUM -->
+        <div id="podium-stairs" class="flex justify-center items-end gap-3 md:gap-6 pt-6 pb-2 min-h-[220px]">
+          <!-- Dynamicznie: Miejsce 2, Miejsce 1, Miejsce 3 -->
+        </div>
+
+        <!-- POZOSTAŁE MIEJSCA -->
+        <div class="space-y-3 text-left bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pozostałe Miejsca:</h4>
+          <div id="podium-others-list" class="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs"></div>
+        </div>
+
+        <button onclick="location.reload()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-xl shadow-lg transition">
+          🔄 Zagraj Ponownie (Reset)
+        </button>
+      </div>
+    </section>
+
+
+    <!-- ============================================================================================== -->
+    <!-- WIDOKI GRACZA (TELEFON) -->
+    <!-- ============================================================================================== -->
+    <section id="view-player-join" class="hidden space-y-6 my-auto">
+      <div class="glass-card p-6 rounded-3xl space-y-5 max-w-md mx-auto">
+        <div class="text-center">
+          <h2 class="text-2xl font-bold text-emerald-400">Dołącz do Zgadywania</h2>
+          <p class="text-slate-400 text-xs mt-1">Wpisz kod podany na ekranie komputera</p>
+        </div>
+
+        <form onsubmit="joinPlayerRoom(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Kod Pokoju (4 cyfry)</label>
+            <input id="input-player-code" type="text" maxlength="6" placeholder="np. 8421" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-center text-2xl font-mono font-bold text-amber-400 tracking-widest focus:outline-none focus:border-emerald-500 uppercase">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Twoje Imię</label>
+            <input id="input-player-name" type="text" placeholder="Wpisz swoje imię..." required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+
+          <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-xl shadow-lg transition">
+            🎮 Wejdź do Gry
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- PLAYER STEP 2: EKRAN GRY Z GŁOSOWANIEM -->
+    <section id="view-player-game" class="hidden space-y-5">
+      <div class="flex justify-between items-center bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
+        <div class="text-xs">
+          <span class="text-slate-400">Gracz:</span>
+          <span id="player-profile-name" class="font-bold text-emerald-400 ml-1">---</span>
+        </div>
+        <div class="text-xs bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full border border-amber-500/30 font-bold">
+          Moje Punkty: <span id="player-score-count">0</span>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl space-y-4 border border-indigo-500/20">
+        <div class="text-center border-b border-slate-800 pb-2">
+          <span id="player-round-badge" class="text-xs text-indigo-400 font-bold uppercase tracking-wider">Runda 1</span>
+          <h3 class="text-lg font-extrabold text-white">Podpowiedzi na Żywo:</h3>
+        </div>
+
+        <div class="space-y-2.5 text-sm">
+          <div id="player-fact-box-1" class="p-3 bg-slate-900/90 rounded-xl border border-slate-800">
+            <span class="text-[10px] text-indigo-400 font-bold uppercase block">Fakt #1</span>
+            <p id="player-fact-1" class="text-slate-200 font-medium mt-0.5">Czekam na ruch Prowadzącego...</p>
+          </div>
+
+          <div id="player-fact-box-2" class="p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 opacity-40">
+            <span class="text-[10px] text-indigo-400 font-bold uppercase block">Fakt #2</span>
+            <p id="player-fact-2" class="text-slate-400 font-medium mt-0.5">🔒 Czeka na odkrycie...</p>
+          </div>
+
+          <div id="player-fact-box-3" class="p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 opacity-40">
+            <span class="text-[10px] text-indigo-400 font-bold uppercase block">Fakt #3</span>
+            <p id="player-fact-3" class="text-slate-400 font-medium mt-0.5">🔒 Czeka na odkrycie...</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="player-voting-section" class="space-y-3">
+        <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider text-center">Kto to Twoim zdaniem jest? Zaznacz:</h4>
+        <div id="player-candidates-grid" class="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
+          <!-- Kafelki z imionami kandydatów -->
+        </div>
+      </div>
+
+      <div id="player-voted-status" class="hidden glass-card p-4 rounded-2xl text-center bg-indigo-950/40 border border-indigo-500/30">
+        <p class="text-xs text-indigo-300">Twój typ został wysłany:</p>
+        <p id="player-voted-choice" class="text-xl font-extrabold text-amber-300 my-1">---</p>
+        <p class="text-[11px] text-slate-400">Czekaj na odkrycie prawdy na dużym ekranie!</p>
+      </div>
+
+      <!-- EKRAN WYNIKU RUNDY NA TELEFONIE -->
+      <div id="player-round-result" class="hidden space-y-4">
+        <div id="player-result-success" class="hidden glass-card p-6 rounded-3xl text-center bg-emerald-950/80 border-2 border-emerald-400 glow-green animate-success space-y-3">
+          <div class="text-5xl">🎉</div>
+          <h3 class="text-2xl font-black text-emerald-300">GIGA SUKCES!</h3>
+          <p class="text-sm text-emerald-100 font-medium">Odpowiedziałeś(-aś) bezbłędnie!</p>
+          <div class="inline-block bg-emerald-500 text-slate-950 px-4 py-2 rounded-xl text-2xl font-black shadow-lg">
+            +1 PKT 🎉
+          </div>
+          <p class="text-xs text-emerald-300/80 pt-1">Twój aktualny wynik: <span class="player-total-score-span font-bold">0</span> pkt</p>
+        </div>
+
+        <div id="player-result-fail" class="hidden glass-card p-6 rounded-3xl text-center bg-rose-950/80 border-2 border-rose-500 glow-red animate-fail space-y-3">
+          <div class="text-5xl">❌</div>
+          <h3 class="text-2xl font-black text-rose-300">PUDŁO!</h3>
+          <p class="text-sm text-slate-300">
+            Twój typ: <span id="player-fail-your-choice" class="font-bold text-amber-300">---</span><br>
+            Prawidłowa odp: <span id="player-fail-correct-answer" class="font-bold text-emerald-400">---</span>
+          </p>
+          <div class="inline-block bg-slate-800 text-slate-400 px-3 py-1 rounded-lg text-xs font-bold border border-slate-700">
+            +0 PKT
+          </div>
+        </div>
+      </div>
+
+      <!-- EKRAN ZAKOŃCZENIA GRY NA TELEFONIE -->
+      <div id="player-final-screen" class="hidden glass-card p-6 rounded-3xl text-center space-y-4 bg-slate-900/90 border-2 border-amber-400/60 animate-success">
+        <div class="text-5xl" id="player-final-icon">🏆</div>
+        <h3 class="text-2xl font-black text-amber-300">KONIEC TELETURNIEJU!</h3>
+        <p class="text-sm text-slate-300">
+          Twój ostateczny wynik:<br>
+          <span id="player-final-score" class="text-3xl font-black text-emerald-400">0 pkt</span>
+        </p>
+        <div id="player-final-rank-badge" class="inline-block px-4 py-2 bg-slate-800 border border-slate-700 rounded-xl font-bold text-slate-200 text-sm">
+          Miejsce w rankingu: #--
+        </div>
+      </div>
+    </section>
+
+    <!-- STOPKA -->
+    <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 mt-6">
+      Kto to jest? — Karta Tajemnic &bull; 100% Bezpośrednie Połączenie P2P
+    </footer>
+  </div>
+
+  <script>
+    // --- STAN GRY ---
+    let myRole = null;
+    let peer = null;
+    let roomCode = '';
+    
+    let hostCards = [];
+    let hostConnections = {};
+    let hostPlayers = [];
+    let currentRoundIndex = 0;
+    let currentRoundFactsRevealed = 1;
+
+    let playerMyName = '';
+    let playerMyScore = 0;
+    let playerVotedChoice = null;
+    let hostConn = null;
+
+    // SYNTEZATOR DŹWIĘKÓW (Web Audio API)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'click') {
+          osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+        } else if (type === 'reveal') {
+          osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+          osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+        } else if (type === 'win') {
+          const now = audioCtx.currentTime;
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          osc.frequency.setValueAtTime(783.99, now + 0.2);
+          osc.frequency.setValueAtTime(1046.50, now + 0.3);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.start(now); osc.stop(now + 0.6);
+        } else if (type === 'fail') {
+          const now = audioCtx.currentTime;
+          osc.frequency.setValueAtTime(200, now);
+          osc.frequency.setValueAtTime(150, now + 0.15);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(now); osc.stop(now + 0.4);
+        }
+      } catch(e) {}
+    }
+
+    function showView(viewId) {
+      const views = [
+        'view-mode-select', 'view-card-creator', 'view-host-setup', 
+        'view-host-game', 'view-player-join', 'view-player-game'
+      ];
+      views.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    function selectRole(role) {
+      playSound('click');
+      myRole = role;
+      if (role === 'creator') showView('view-card-creator');
+      else if (role === 'host') showView('view-host-setup');
+      else showView('view-player-join');
+    }
+
+    // --- BEZPOŚREDNIE WYSYŁANIE KARTY DANYCH (P2P) ---
+    function submitCardDirectP2P(e) {
+      e.preventDefault();
+      playSound('click');
+
+      const targetCode = document.getElementById('create-room-code').value.trim().toUpperCase();
+      const name = document.getElementById('create-name').value.trim();
+      const f1 = document.getElementById('create-fact1').value.trim();
+      const f2 = document.getElementById('create-fact2').value.trim();
+      const f3 = document.getElementById('create-fact3').value.trim();
+
+      const btn = document.getElementById('btn-submit-card-p2p');
+      const msgBox = document.getElementById('creator-status-msg');
+      const msgText = document.getElementById('creator-status-text');
+
+      btn.disabled = true;
+      btn.innerText = '⏳ Łączenie z Prowadzącym...';
+      msgBox.classList.remove('hidden');
+      msgBox.className = 'p-4 rounded-2xl text-center bg-slate-900 border border-slate-700';
+      msgText.innerText = '📡 Łączenie z komputerem Prowadzącego...';
+
+      const tempPeer = new Peer();
+
+      tempPeer.on('open', () => {
+        const targetPeerId = 'ktotojest-room-' + targetCode;
+        const conn = tempPeer.connect(targetPeerId);
+
+        conn.on('open', () => {
+          conn.send({
+            type: 'NEW_CARD_SUBMISSION',
+            card: { name, facts: [f1, f2, f3] }
+          });
+
+          msgBox.className = 'p-4 rounded-2xl text-center bg-emerald-950 border border-emerald-500';
+          msgText.innerText = '✅ Karta dotarła na komputer Prowadzącego!';
+          btn.innerText = '✅ Wysłano Pomyślnie!';
+          playSound('win');
+
+          setTimeout(() => { tempPeer.destroy(); }, 2000);
+        });
+
+        conn.on('error', (err) => {
+          msgBox.className = 'p-4 rounded-2xl text-center bg-rose-950 border border-rose-500';
+          msgText.innerText = '❌ Nie udało się połączyć. Sprawdź Kod Pokoju lub czy Prowadzący uruchomił pokój!';
+          btn.disabled = false;
+          btn.innerText = '🚀 Wyślij bezpośrednio do Prowadzącego';
+        });
+      });
+
+      tempPeer.on('error', (err) => {
+        msgBox.className = 'p-4 rounded-2xl text-center bg-rose-950 border border-rose-500';
+        msgText.innerText = '❌ Błąd połączenia P2P: ' + err.message;
+        btn.disabled = false;
+        btn.innerText = '🚀 Wyślij bezpośrednio do Prowadzącego';
+      });
+    }
+
+    function copyCardCodeToClipboard() {
+      const name = document.getElementById('create-name').value.trim() || 'Nieznany';
+      const f1 = document.getElementById('create-fact1').value.trim() || 'Fakt1';
+      const f2 = document.getElementById('create-fact2').value.trim() || 'Fakt2';
+      const f3 = document.getElementById('create-fact3').value.trim() || 'Fakt3';
+
+      const codeStr = `KARTA#${name}#${f1}|${f2}|${f3}`;
+      navigator.clipboard.writeText(codeStr);
+      alert('Skopiowano kod do schowka: \n' + codeStr + '\n\nWyślij go Prowadzącemu na czacie!');
+    }
+
+    // --- LOGIKA HOST ---
+    function initHostRoom() {
+      playSound('click');
+
+      const numCode = Math.floor(1000 + Math.random() * 9000);
+      roomCode = numCode.toString();
+      const peerId = 'ktotojest-room-' + roomCode;
+
+      peer = new Peer(peerId);
+
+      peer.on('open', (id) => {
+        document.getElementById('host-room-code-display').innerText = roomCode;
+        document.getElementById('host-init-container').classList.add('hidden');
+        document.getElementById('host-room-info-box').classList.remove('hidden');
+      });
+
+      peer.on('connection', (conn) => {
+        conn.on('open', () => { hostConnections[conn.peer] = conn; });
+        conn.on('data', (data) => { handleHostReceivedData(conn, data); });
+        conn.on('close', () => { delete hostConnections[conn.peer]; });
+      });
+
+      peer.on('error', (err) => {
+        if (err.type === 'unavailable-id') initHostRoom();
+        else alert('Błąd połączenia PeerJS: ' + err.message);
+      });
+    }
+
+    function handleHostReceivedData(conn, data) {
+      if (data.type === 'NEW_CARD_SUBMISSION') {
+        const card = data.card;
+        if (card && card.name) {
+          hostCards = hostCards.filter(c => c.name !== card.name);
+          hostCards.push(card);
+          renderHostCardsList();
+          playSound('reveal');
+        }
+      } else if (data.type === 'JOIN_GAME') {
+        const playerName = data.playerName;
+        let existing = hostPlayers.find(p => p.name === playerName);
+        if (!existing) {
+          existing = { id: conn.peer, name: playerName, score: 0, votedChoice: null };
+          hostPlayers.push(existing);
+        } else {
+          existing.id = conn.peer;
+        }
+
+        conn.send({
+          type: 'JOINED_SUCCESS',
+          candidates: hostCards.map(c => c.name)
+        });
+
+        if (!document.getElementById('view-host-game').classList.contains('hidden')) {
+          sendGameStateToPlayer(conn);
+        }
+      } else if (data.type === 'PLAYER_VOTE') {
+        const player = hostPlayers.find(p => p.id === conn.peer || p.name === data.playerName);
+        if (player) {
+          player.votedChoice = data.choice;
+          updateHostVoteCounter();
+        }
+      }
+    }
+
+    function parseBatchPastedCards() {
+      playSound('click');
+      const raw = document.getElementById('host-batch-paste-input').value;
+      const lines = raw.split('\n');
+      let count = 0;
+
+      lines.forEach(line => {
+        if (line.includes('KARTA#')) {
+          const parts = line.split('#');
+          if (parts.length >= 3) {
+            const name = parts[1].trim();
+            const facts = parts[2].split('|').map(f => f.trim());
+            if (name && facts.length >= 3) {
+              hostCards = hostCards.filter(c => c.name !== name);
+              hostCards.push({ name, facts });
+              count++;
+            }
+          }
+        }
+      });
+
+      renderHostCardsList();
+      alert(`Wczytano ${count} kart z wklejonego tekstu!`);
+    }
+
+    function renderHostCardsList() {
+      document.getElementById('host-card-count').innerText = hostCards.length;
+      const container = document.getElementById('host-card-list');
+      container.innerHTML = '';
+
+      hostCards.forEach((card, index) => {
+        const item = document.createElement('div');
+        item.className = 'bg-slate-900 border border-slate-800 p-3 rounded-xl flex justify-between items-center text-xs';
+        item.innerHTML = `
+          <div>
+            <span class="font-bold text-amber-300 text-sm block">${card.name}</span>
+            <span class="text-slate-400">1. ${card.facts[0]}</span>
+          </div>
+          <button onclick="removeHostCard(${index})" class="text-rose-400 hover:text-rose-300 p-1">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        `;
+        container.appendChild(item);
+      });
+
+      document.getElementById('btn-start-show').disabled = hostCards.length === 0;
+    }
+
+    function removeHostCard(index) {
+      playSound('click');
+      hostCards.splice(index, 1);
+      renderHostCardsList();
+    }
+
+    function clearAllCards() {
+      playSound('click');
+      hostCards = [];
+      renderHostCardsList();
+    }
+
+    function loadSampleData() {
+      playSound('click');
+      hostCards = [
+        { name: "Kasia", facts: ["Spałam kiedyś na lotnisku", "Umiem lutować elektronikę", "Chciałabym pojechać do Japonii"] },
+        { name: "Michał", facts: ["Skakałem na spadochronie", "Nie lubię kawy", "Mam 3 koty w domu"] },
+        { name: "Ania", facts: ["Grałam na skrzypcach 5 lat", "Znam 4 języki obce", "Biegłam w maratonie"] },
+        { name: "Piotrek", facts: ["Potrafię ułożyć kostkę Rubika w 20s", "Byłem w Korei Południowej", "Kiedyś wygrałem turniej szachowy"] }
+      ];
+      renderHostCardsList();
+    }
+
+    function startHostGame() {
+      if (hostCards.length === 0) return;
+      playSound('click');
+      currentRoundIndex = 0;
+      showView('view-host-game');
+      setupHostRound();
+    }
+
+    function setupHostRound() {
+      currentRoundFactsRevealed = 1;
+      hostPlayers.forEach(p => p.votedChoice = null);
+      updateHostVoteCounter();
+
+      const currentCard = hostCards[currentRoundIndex];
+      document.getElementById('host-round-badge').innerText = `Runda ${currentRoundIndex + 1} / ${hostCards.length}`;
+      document.getElementById('host-mystery-title').innerText = `❓ Tajemnicza Osoba #${currentRoundIndex + 1}`;
+
+      document.getElementById('fact-text-1').innerText = currentCard.facts[0];
+      document.getElementById('fact-text-2').innerText = '🔒 [Zablokowany]';
+      document.getElementById('fact-text-3').innerText = '🔒 [Zablokowany]';
+
+      document.getElementById('fact-box-2').className = 'p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all';
+      document.getElementById('fact-box-3').className = 'p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all';
+
+      document.getElementById('btn-reveal-fact-2').disabled = false;
+      document.getElementById('btn-reveal-fact-3').disabled = true;
+
+      document.getElementById('host-reveal-modal').classList.add('hidden');
+      broadcastGameState();
+    }
+
+    function updateHostVoteCounter() {
+      const votedCount = hostPlayers.filter(p => p.votedChoice !== null).length;
+      document.getElementById('host-votes-count').innerText = `${votedCount} / ${hostPlayers.length}`;
+    }
+
+    function revealFact(factNum) {
+      playSound('reveal');
+      currentRoundFactsRevealed = factNum;
+      const currentCard = hostCards[currentRoundIndex];
+
+      if (factNum === 2) {
+        document.getElementById('fact-text-2').innerText = currentCard.facts[1];
+        document.getElementById('fact-box-2').className = 'p-4 rounded-xl bg-slate-900 border border-indigo-500/30 transition-all';
+        document.getElementById('btn-reveal-fact-2').disabled = true;
+        document.getElementById('btn-reveal-fact-3').disabled = false;
+      } else if (factNum === 3) {
+        document.getElementById('fact-text-3').innerText = currentCard.facts[2];
+        document.getElementById('fact-box-3').className = 'p-4 rounded-xl bg-slate-900 border border-indigo-500/30 transition-all';
+        document.getElementById('btn-reveal-fact-3').disabled = true;
+      }
+
+      broadcastGameState();
+    }
+
+    function revealAnswer() {
+      playSound('win');
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+      const currentCard = hostCards[currentRoundIndex];
+      const correctAnswer = currentCard.name;
+
+      const correctPlayers = [];
+      hostPlayers.forEach(p => {
+        if (p.votedChoice === correctAnswer) {
+          p.score += 1;
+          correctPlayers.push(p.name);
+        }
+      });
+
+      document.getElementById('host-revealed-name').innerText = correctAnswer;
+      const winnersContainer = document.getElementById('host-correct-players-list');
+      
+      if (correctPlayers.length > 0) {
+        winnersContainer.innerHTML = correctPlayers.map(name => `
+          <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-3 py-1.5 rounded-xl text-sm animate-pulse">
+            🎖️ ${name} (+1 PKT)
+          </span>
+        `).join('');
+      } else {
+        winnersContainer.innerHTML = `<span class="text-slate-500 text-xs italic">Nikt nie odgadł tym razem...</span>`;
+      }
+
+      renderLeaderboard();
+      document.getElementById('host-reveal-modal').classList.remove('hidden');
+
+      Object.keys(hostConnections).forEach(peerId => {
+        const conn = hostConnections[peerId];
+        const player = hostPlayers.find(p => p.id === peerId);
+        if (player) {
+          conn.send({
+            type: 'ROUND_RESULT',
+            isCorrect: player.votedChoice === correctAnswer,
+            correctAnswer: correctAnswer,
+            yourChoice: player.votedChoice,
+            myScore: player.score
+          });
+        }
+      });
+    }
+
+    function renderLeaderboard() {
+      const sorted = [...hostPlayers].sort((a, b) => b.score - a.score);
+      document.getElementById('host-leaderboard').innerHTML = sorted.map((p, idx) => `
+        <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex justify-between items-center text-xs">
+          <span class="font-bold text-slate-300">${idx + 1}. ${p.name}</span>
+          <span class="font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">${p.score} pkt</span>
+        </div>
+      `).join('');
+    }
+
+    function nextRound() {
+      playSound('click');
+      currentRoundIndex++;
+      
+      if (currentRoundIndex >= hostCards.length) {
+        showFinalPodium();
+      } else {
+        setupHostRound();
+      }
+    }
+
+    function showFinalPodium() {
+      playSound('win');
+      confetti({ particleCount: 200, spread: 100, origin: { y: 0.5 } });
+
+      document.getElementById('host-reveal-modal').classList.add('hidden');
+      document.getElementById('host-podium-modal').classList.remove('hidden');
+
+      const sorted = [...hostPlayers].sort((a, b) => b.score - a.score);
+
+      const stairsContainer = document.getElementById('podium-stairs');
+      stairsContainer.innerHTML = '';
+
+      const p1 = sorted[0] || { name: '-', score: 0 };
+      const p2 = sorted[1] || { name: '-', score: 0 };
+      const p3 = sorted[2] || { name: '-', score: 0 };
+
+      stairsContainer.innerHTML = `
+        <!-- 2 MIEJSCE (SREBRO) -->
+        <div class="flex flex-col items-center flex-1 max-w-[120px]">
+          <span class="text-2xl mb-1">🥈</span>
+          <span class="font-bold text-slate-200 text-sm truncate w-full">${p2.name}</span>
+          <span class="text-xs text-amber-300 font-bold mb-2">${p2.score} pkt</span>
+          <div class="w-full bg-slate-800 border-t-4 border-slate-400 h-28 rounded-t-xl flex items-center justify-center font-black text-2xl text-slate-400">2</div>
+        </div>
+
+        <!-- 1 MIEJSCE (ZŁOTO) -->
+        <div class="flex flex-col items-center flex-1 max-w-[140px]">
+          <span class="text-4xl mb-1 animate-bounce">🥇</span>
+          <span class="font-black text-amber-300 text-base truncate w-full">${p1.name}</span>
+          <span class="text-sm text-emerald-400 font-black mb-2">${p1.score} pkt</span>
+          <div class="w-full bg-gradient-to-b from-amber-500 to-amber-700 border-t-4 border-amber-300 h-40 rounded-t-xl flex items-center justify-center font-black text-4xl text-slate-950 shadow-2xl">1</div>
+        </div>
+
+        <!-- 3 MIEJSCE (BRĄZ) -->
+        <div class="flex flex-col items-center flex-1 max-w-[120px]">
+          <span class="text-2xl mb-1">🥉</span>
+          <span class="font-bold text-amber-600 text-sm truncate w-full">${p3.name}</span>
+          <span class="text-xs text-amber-300 font-bold mb-2">${p3.score} pkt</span>
+          <div class="w-full bg-slate-900 border-t-4 border-amber-800 h-20 rounded-t-xl flex items-center justify-center font-black text-xl text-amber-700">3</div>
+        </div>
+      `;
+
+      const othersContainer = document.getElementById('podium-others-list');
+      const others = sorted.slice(3);
+      if (others.length > 0) {
+        othersContainer.innerHTML = others.map((p, idx) => `
+          <div class="bg-slate-950 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+            <span class="font-semibold text-slate-300">${idx + 4}. ${p.name}</span>
+            <span class="font-bold text-amber-400">${p.score} pkt</span>
+          </div>
+        `).join('');
+      } else {
+        othersContainer.innerHTML = `<span class="text-slate-500 italic text-xs">Brak pozostałych graczy</span>`;
+      }
+
+      Object.keys(hostConnections).forEach(peerId => {
+        const conn = hostConnections[peerId];
+        const player = hostPlayers.find(p => p.id === peerId);
+        if (player) {
+          const rank = sorted.findIndex(p => p.name === player.name) + 1;
+          conn.send({
+            type: 'GAME_FINISHED',
+            rank: rank,
+            score: player.score,
+            totalPlayers: sorted.length
+          });
+        }
+      });
+    }
+
+    function broadcastGameState() {
+      const currentCard = hostCards[currentRoundIndex];
+      const stateData = {
+        type: 'GAME_STATE_UPDATE',
+        roundNum: currentRoundIndex + 1,
+        factsRevealed: currentRoundFactsRevealed,
+        facts: [
+          currentCard.facts[0],
+          currentRoundFactsRevealed >= 2 ? currentCard.facts[1] : null,
+          currentRoundFactsRevealed >= 3 ? currentCard.facts[2] : null
+        ],
+        candidates: hostCards.map(c => c.name)
+      };
+
+      Object.values(hostConnections).forEach(conn => conn.send(stateData));
+    }
+
+    function sendGameStateToPlayer(conn) {
+      const currentCard = hostCards[currentRoundIndex];
+      conn.send({
+        type: 'GAME_STATE_UPDATE',
+        roundNum: currentRoundIndex + 1,
+        factsRevealed: currentRoundFactsRevealed,
+        facts: [
+          currentCard.facts[0],
+          currentRoundFactsRevealed >= 2 ? currentCard.facts[1] : null,
+          currentRoundFactsRevealed >= 3 ? currentCard.facts[2] : null
+        ],
+        candidates: hostCards.map(c => c.name)
+      });
+    }
+
+    // --- LOGIKA GRACZA (PLAYER) ---
+    function joinPlayerRoom(e) {
+      e.preventDefault();
+      playSound('click');
+
+      const codeInput = document.getElementById('input-player-code').value.trim();
+      playerMyName = document.getElementById('input-player-name').value.trim();
+
+      if (!codeInput || !playerMyName) return;
+
+      const targetHostPeerId = 'ktotojest-room-' + codeInput;
+      peer = new Peer();
+
+      peer.on('open', () => {
+        hostConn = peer.connect(targetHostPeerId);
+
+        hostConn.on('open', () => {
+          document.getElementById('player-profile-name').innerText = playerMyName;
+          showView('view-player-game');
+
+          hostConn.send({
+            type: 'JOIN_GAME',
+            playerName: playerMyName
+          });
+        });
+
+        hostConn.on('data', (data) => { handlePlayerReceivedData(data); });
+        hostConn.on('error', (err) => { alert('Nie udało się połączyć z pokojem: ' + err); });
+      });
+    }
+
+    function handlePlayerReceivedData(data) {
+      if (data.type === 'JOINED_SUCCESS') {
+        renderPlayerCandidateButtons(data.candidates);
+      } else if (data.type === 'GAME_STATE_UPDATE') {
+        updatePlayerGameUI(data);
+      } else if (data.type === 'ROUND_RESULT') {
+        showPlayerRoundResult(data);
+      } else if (data.type === 'GAME_FINISHED') {
+        document.getElementById('player-voting-section').classList.add('hidden');
+        document.getElementById('player-voted-status').classList.add('hidden');
+        document.getElementById('player-round-result').classList.add('hidden');
+        
+        const finalScreen = document.getElementById('player-final-screen');
+        finalScreen.classList.remove('hidden');
+
+        document.getElementById('player-final-score').innerText = `${data.score} pkt`;
+        document.getElementById('player-final-rank-badge').innerText = `Twój wynik: #${data.rank} z ${data.totalPlayers} graczy`;
+
+        if (data.rank === 1) {
+          document.getElementById('player-final-icon').innerText = '🥇';
+          confetti({ particleCount: 150, spread: 80 });
+        } else if (data.rank === 2) {
+          document.getElementById('player-final-icon').innerText = '🥈';
+        } else if (data.rank === 3) {
+          document.getElementById('player-final-icon').innerText = '🥉';
+        }
+      }
+    }
+
+    function updatePlayerGameUI(data) {
+      document.getElementById('player-round-result').classList.add('hidden');
+      document.getElementById('player-voting-section').classList.remove('hidden');
+
+      document.getElementById('player-round-badge').innerText = `Runda ${data.roundNum}`;
+      document.getElementById('player-fact-1').innerText = data.facts[0];
+
+      if (data.factsRevealed >= 2 && data.facts[1]) {
+        document.getElementById('player-fact-2').innerText = data.facts[1];
+        document.getElementById('player-fact-box-2').className = 'p-3 bg-slate-900/90 rounded-xl border border-indigo-500/30';
+      } else {
+        document.getElementById('player-fact-2').innerText = '🔒 Czeka na odkrycie...';
+        document.getElementById('player-fact-box-2').className = 'p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 opacity-40';
+      }
+
+      if (data.factsRevealed >= 3 && data.facts[2]) {
+        document.getElementById('player-fact-3').innerText = data.facts[2];
+        document.getElementById('player-fact-box-3').className = 'p-3 bg-slate-900/90 rounded-xl border border-indigo-500/30';
+      } else {
+        document.getElementById('player-fact-3').innerText = '🔒 Czeka na odkrycie...';
+        document.getElementById('player-fact-box-3').className = 'p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 opacity-40';
+      }
+
+      renderPlayerCandidateButtons(data.candidates);
+    }
+
+    function renderPlayerCandidateButtons(candidates) {
+      const grid = document.getElementById('player-candidates-grid');
+      grid.innerHTML = '';
+
+      candidates.forEach(name => {
+        const btn = document.createElement('button');
+        const isSelected = playerVotedChoice === name;
+
+        btn.className = `p-3.5 rounded-xl font-bold text-sm transition-all border text-center ${
+          isSelected 
+            ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-lg scale-95' 
+            : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border-slate-700'
+        }`;
+        btn.innerText = name;
+        btn.onclick = () => submitPlayerVote(name);
+        grid.appendChild(btn);
+      });
+    }
+
+    function submitPlayerVote(candidateName) {
+      playSound('click');
+      playerVotedChoice = candidateName;
+
+      const buttons = document.querySelectorAll('#player-candidates-grid button');
+      buttons.forEach(btn => {
+        if (btn.innerText === candidateName) {
+          btn.className = 'p-3.5 rounded-xl font-bold text-sm bg-amber-500 text-slate-950 border-amber-400 shadow-lg scale-95';
+        } else {
+          btn.className = 'p-3.5 rounded-xl font-bold text-sm bg-slate-900 opacity-50 text-slate-400 border-slate-800';
+        }
+      });
+
+      document.getElementById('player-voted-status').classList.remove('hidden');
+      document.getElementById('player-voted-choice').innerText = candidateName;
+
+      if (hostConn) {
+        hostConn.send({
+          type: 'PLAYER_VOTE',
+          playerName: playerMyName,
+          choice: candidateName
+        });
+      }
+    }
+
+    function showPlayerRoundResult(data) {
+      document.getElementById('player-voting-section').classList.add('hidden');
+      document.getElementById('player-voted-status').classList.add('hidden');
+
+      const resultContainer = document.getElementById('player-round-result');
+      const successBox = document.getElementById('player-result-success');
+      const failBox = document.getElementById('player-result-fail');
+
+      resultContainer.classList.remove('hidden');
+
+      if (data.isCorrect) {
+        playSound('win');
+        confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+
+        playerMyScore = data.myScore;
+        document.getElementById('player-score-count').innerText = playerMyScore;
+        document.querySelectorAll('.player-total-score-span').forEach(s => s.innerText = playerMyScore);
+
+        successBox.classList.remove('hidden');
+        failBox.classList.add('hidden');
+      } else {
+        playSound('fail');
+        document.getElementById('player-fail-your-choice').innerText = data.yourChoice || '(brak głosu)';
+        document.getElementById('player-fail-correct-answer').innerText = data.correctAnswer;
+
+        failBox.classList.remove('hidden');
+        successBox.classList.add('hidden');
+      }
+
+      playerVotedChoice = null;
+    }
+  </script>
+</body>
+</html>
