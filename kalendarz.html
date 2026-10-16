@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kto to jest? — Karta Tajemnic</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <!-- PeerJS for WebRTC P2P communication -->
+    <!-- PeerJS WebRTC P2P -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
@@ -50,7 +50,6 @@
             animation: pulse-glow 3s infinite ease-in-out;
         }
 
-        /* Custom scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -78,11 +77,11 @@
                         Karta Tajemnic
                         <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">LIVE</span>
                     </h1>
-                    <p class="text-[11px] text-slate-400 font-medium">Gra Integracyjna „Kto to jest?”</p>
+                    <p class="text-[11px] text-slate-400 font-medium">Gra Teleturniejowa „Kto to jest?”</p>
                 </div>
             </div>
 
-            <!-- Active Room Info Header -->
+            <!-- Active Room Header Info -->
             <div id="headerRoomInfo" class="hidden flex items-center gap-2 bg-slate-900 border border-indigo-500/30 px-3.5 py-1.5 rounded-2xl">
                 <span class="text-[10px] uppercase font-extrabold text-indigo-400">Pokój:</span>
                 <span id="headerRoomCode" class="font-mono font-black text-white text-sm sm:text-base tracking-widest">----</span>
@@ -91,7 +90,7 @@
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Viewport -->
     <main class="max-w-5xl w-full mx-auto px-4 py-4 sm:py-6 flex-grow flex flex-col justify-center items-center">
 
         <!-- ==================== SCREEN 0: ROLE SELECTION ==================== -->
@@ -103,7 +102,7 @@
                     </span>
                     <h2 class="text-2xl sm:text-4xl font-black text-white tracking-tight">Jak Chcesz Zagrać?</h2>
                     <p class="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">
-                        Jeden komputer wyświetla teleturniej, a gracze zgadują na telefonach w czasie rzeczywistym!
+                        Jeden ekran wyświetla teleturniej, a wszyscy gracze zgadują na telefonach w czasie rzeczywistym!
                     </p>
                 </div>
 
@@ -115,7 +114,7 @@
                         </div>
                         <div>
                             <h3 class="text-lg font-extrabold text-white">1. KOMPUTER GŁÓWNY</h3>
-                            <p class="text-xs text-slate-400 mt-1">Prowadzący. Wpisujesz karty uczestników i prowadzisz grających.</p>
+                            <p class="text-xs text-slate-400 mt-1">Prowadzący. Wpisujesz tajemnicze fakty o uczestnikach i prowadzisz grę.</p>
                         </div>
                         <span class="inline-flex items-center text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition">
                             Utwórz Pokój ➡️
@@ -129,7 +128,7 @@
                         </div>
                         <div>
                             <h3 class="text-lg font-extrabold text-white">2. TELEFON</h3>
-                            <p class="text-xs text-slate-400 mt-1">Uczestnik / Gracz. Dołączasz i na żywo widzisz fakty oraz zgadujesz.</p>
+                            <p class="text-xs text-slate-400 mt-1">Uczestnik / Gracz. Dołączasz kodem, czytasz podpowiedzi i zgadujesz.</p>
                         </div>
                         <span class="inline-flex items-center text-xs font-bold text-purple-400 group-hover:translate-x-1 transition">
                             Dołącz do Gry ➡️
@@ -145,10 +144,10 @@
                 <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
                     <div>
                         <span class="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block">Krok 1 z 2</span>
-                        <h2 class="text-2xl font-black text-white">Wprowadź Uczestników i Fakty</h2>
+                        <h2 class="text-2xl font-black text-white">Dodaj Uczestników i Fakty</h2>
                     </div>
                     <button onclick="loadSampleData()" class="text-xs px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/30 font-semibold transition">
-                        ⚡ Wgraj Przykład (Przetestuj)
+                        ⚡ Wgraj Przykład (Test)
                     </button>
                 </div>
 
@@ -156,59 +155,59 @@
                 <form id="formAddCard" onsubmit="addParticipantCard(event)" class="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-4">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                            Imię Uczestnika <span class="text-indigo-400">*</span>
+                            Imię i Nazwisko / Pseudonim <span class="text-indigo-400">*</span>
                         </label>
                         <input type="text" id="inputName" required placeholder="np. Kasia, Michał, Adam..." class="w-full px-4 py-2.5 rounded-xl glass-input text-sm font-semibold">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #1 (Trudny - 3 pkt)</label>
+                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #1 (Podpowiedź 1)</label>
                             <input type="text" id="inputFact1" required placeholder="np. Spałem na lotnisku w Rzymie" class="w-full px-3.5 py-2 rounded-xl glass-input text-xs">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #2 (Średni - 2 pkt)</label>
+                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #2 (Podpowiedź 2)</label>
                             <input type="text" id="inputFact2" required placeholder="np. Umiem grać na skrzypcach" class="w-full px-3.5 py-2 rounded-xl glass-input text-xs">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #3 (Łatwy - 1 pkt)</label>
+                            <label class="block text-[11px] font-bold text-indigo-300 mb-1">Fakt #3 (Podpowiedź 3)</label>
                             <input type="text" id="inputFact3" required placeholder="np. Mam 3 rudy koty" class="w-full px-3.5 py-2 rounded-xl glass-input text-xs">
                         </div>
                     </div>
 
                     <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                        ➕ Dodaj Kartę Uczestnika
+                        ➕ Dodaj Osobe Do Gry
                     </button>
                 </form>
 
                 <!-- Added Cards List -->
                 <div class="space-y-3">
                     <div class="flex items-center justify-between text-xs font-bold text-slate-300">
-                        <span>Dodane Karty (<span id="countAddedCards">0</span>):</span>
+                        <span>Dodane Osoby (<span id="countAddedCards">0</span>):</span>
                         <span class="text-slate-400 text-[11px]">Wymagane minimum 2 osoby</span>
                     </div>
 
                     <div id="listHostCards" class="space-y-2 max-h-64 overflow-y-auto pr-1">
-                        <!-- Dynamic Cards -->
+                        <!-- Dynamic Cards List -->
                     </div>
                 </div>
 
                 <!-- Create Room Action -->
                 <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p class="text-xs text-slate-400">
-                        Po utworzeniu pokoju pojawi się kod i Kod QR do zeskanowania telefonem.
+                        Po utworzeniu pokoju wygeneruje się 4-cyfrowy kod dla graczy.
                     </p>
                     <button id="btnCreateRoom" onclick="hostCreateRoom()" disabled class="w-full sm:w-auto px-8 py-4 bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-emerald-500 text-white font-black text-sm uppercase tracking-wider rounded-2xl shadow-xl shadow-emerald-600/20 transition transform active:scale-95 shrink-0 flex items-center justify-center gap-2">
-                        🚀 <span>Utwórz Pokój i Pokaż Kod QR</span>
+                        🚀 <span>Utwórz Pokój do Zgadywania</span>
                     </button>
                 </div>
             </div>
         </section>
 
-        <!-- ==================== SCREEN 2: HOST LOBBY & GAME SHOW ==================== -->
+        <!-- ==================== SCREEN 2: HOST MAIN TELETURNIEJ GAME SCREEN ==================== -->
         <section id="screenHostGame" class="w-full max-w-4xl hidden transition-all duration-300 space-y-6">
 
-            <!-- Host Top Header / Stats & QR Code -->
+            <!-- Host Header / Room Code Bar -->
             <div class="glass-panel rounded-3xl p-5 border border-slate-700/60 flex flex-col md:flex-row items-center justify-between gap-6">
                 
                 <!-- Left Room Code & QR -->
@@ -219,19 +218,19 @@
                     <div>
                         <span class="text-[10px] uppercase font-extrabold text-indigo-400 block tracking-widest">Kod Pokoju dla Telefonów:</span>
                         <span id="displayHostCode" class="font-mono font-black text-3xl text-white tracking-widest block my-1">----</span>
-                        <span class="text-[11px] text-slate-400 block">Zeskanuj QR lub wpisz kod na stronie</span>
+                        <span class="text-[11px] text-slate-400 block">Zeskanuj QR lub wpisz kod na telefonie</span>
                     </div>
                 </div>
 
-                <!-- Right Stats & Actions -->
+                <!-- Right Controls -->
                 <div class="flex flex-wrap items-center justify-between md:justify-end gap-4 w-full md:w-auto border-t md:border-t-0 border-slate-800 pt-3 md:pt-0">
                     <div class="text-left md:text-right">
-                        <span class="text-xs font-bold text-slate-300 block">Karta <span id="gameCurrentIdx">1</span> z <span id="gameTotalCards">0</span></span>
+                        <span class="text-xs font-bold text-slate-300 block">Osoba <span id="gameCurrentIdx">1</span> z <span id="gameTotalCards">0</span></span>
                         <span class="text-xs text-slate-400">Połączone Telefony: <strong id="countConnectedPhones" class="text-emerald-400 text-sm font-black">0</strong></span>
                     </div>
 
                     <button onclick="hostNextCard()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5 border border-slate-700 shadow">
-                        ➡️ <span>Następna Osoba</span>
+                        ➡️ <span>Rozpocznij Nową Rundę</span>
                     </button>
                 </div>
             </div>
@@ -248,38 +247,38 @@
                                 <h3 id="hostMysteryTitle" class="text-xl sm:text-3xl font-black text-white">Tajemnicza Osoba #1</h3>
                             </div>
 
-                            <!-- Live Votes Counter Badge -->
+                            <!-- Live Votes Counter -->
                             <div class="bg-indigo-950/80 border border-indigo-500/40 px-4 py-2 rounded-2xl text-right">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Głosy na telefonach:</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Oddano głosów:</span>
                                 <span class="text-lg font-black text-emerald-400"><span id="countVotesSubmitted">0</span> / <span id="countVotesTotal">0</span></span>
                             </div>
                         </div>
 
-                        <!-- Synchronized Fact Displays -->
+                        <!-- Synchronized Fact Boxes -->
                         <div class="space-y-3 my-2">
                             <!-- Fact 1 -->
-                            <div id="factBox1" class="p-4.5 rounded-2xl bg-slate-900/90 border border-indigo-500/40 transition-all duration-500 flex items-start gap-3 shadow-md">
+                            <div id="factBox1" class="p-4 rounded-2xl bg-slate-900/90 border border-indigo-500/40 transition-all duration-500 flex items-start gap-3 shadow-md">
                                 <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow">1</span>
                                 <div class="flex-grow">
-                                    <span class="text-[10px] uppercase font-bold text-indigo-400 block mb-0.5">Fakt #1 (Za 3 Punkty)</span>
+                                    <span class="text-[10px] uppercase font-bold text-indigo-400 block mb-0.5">Fakt #1</span>
                                     <p id="hostTextFact1" class="text-base sm:text-lg font-bold text-slate-100 leading-relaxed">...</p>
                                 </div>
                             </div>
 
                             <!-- Fact 2 -->
-                            <div id="factBox2" class="p-4.5 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]">
+                            <div id="factBox2" class="p-4 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]">
                                 <span id="factBadge2" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-sm shrink-0">2</span>
                                 <div class="flex-grow">
-                                    <span class="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Fakt #2 (Za 2 Punkty)</span>
+                                    <span class="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Fakt #2</span>
                                     <p id="hostTextFact2" class="text-base sm:text-lg font-bold text-slate-400 leading-relaxed">🔒 Zablokowany</p>
                                 </div>
                             </div>
 
                             <!-- Fact 3 -->
-                            <div id="factBox3" class="p-4.5 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]">
+                            <div id="factBox3" class="p-4 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]">
                                 <span id="factBadge3" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-sm shrink-0">3</span>
                                 <div class="flex-grow">
-                                    <span class="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Fakt #3 (Za 1 Punkt)</span>
+                                    <span class="text-[10px] uppercase font-bold text-slate-500 block mb-0.5">Fakt #3</span>
                                     <p id="hostTextFact3" class="text-base sm:text-lg font-bold text-slate-400 leading-relaxed">🔒 Zablokowany</p>
                                 </div>
                             </div>
@@ -288,7 +287,7 @@
                         <!-- Reveal Control Actions -->
                         <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center gap-3">
                             <button id="btnHostRevealNext" onclick="hostRevealNextFact()" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center justify-center gap-2 border border-slate-700">
-                                🔍 <span>Odsłoń Fakt #2</span>
+                                🔍 <span id="btnRevealText">Odsłoń Fakt 2</span>
                             </button>
 
                             <button onclick="hostGrandReveal()" class="w-full sm:flex-grow py-3.5 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-pink-500 hover:from-amber-600 hover:via-orange-600 hover:to-pink-600 text-white font-black text-sm rounded-2xl shadow-lg shadow-orange-500/25 transition transform active:scale-95 flex items-center justify-center gap-2">
@@ -297,21 +296,21 @@
                         </div>
                     </div>
 
-                    <!-- REVEALED AUTHOR VIEW (CLEAN, ELEGANT REPLACEMENT FOR 3D FLIP) -->
-                    <div id="hostAnswerView" class="hidden w-full flex flex-col justify-between items-center text-center space-y-6 animate-fadeIn">
+                    <!-- REVEALED AUTHOR VIEW -->
+                    <div id="hostAnswerView" class="hidden w-full flex flex-col justify-between items-center text-center space-y-6">
                         <div class="w-full flex items-center justify-between border-b border-slate-800 pb-3">
                             <span class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-2">
                                 ✨ ROZWIAZANIE ZAGADKI
                             </span>
-                            <span class="text-xs text-slate-400">Runda Zakwalifikowana</span>
+                            <span class="text-xs text-slate-400">Wyniki Rund Przesłane Na Telefony</span>
                         </div>
 
                         <div class="my-auto py-6 space-y-4">
-                            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-emerald-400 via-teal-400 to-cyan-500 text-slate-950 flex items-center justify-center font-black text-5xl sm:text-6xl mx-auto shadow-2xl shadow-emerald-500/30 animate-bounce">
+                            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-emerald-400 via-teal-400 to-cyan-500 text-slate-950 flex items-center justify-center font-black text-5xl sm:text-6xl mx-auto shadow-2xl shadow-emerald-500/30">
                                 👑
                             </div>
                             <div>
-                                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">To była karta osoby:</p>
+                                <p class="text-xs font-bold uppercase tracking-widest text-slate-400">To była osoba:</p>
                                 <h2 id="hostRevealedAuthorName" class="text-3xl sm:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 mt-1">
                                     ...
                                 </h2>
@@ -320,15 +319,15 @@
 
                         <!-- Winners List for this Round -->
                         <div class="w-full bg-slate-950/80 p-4 rounded-2xl border border-slate-800 text-left space-y-2">
-                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Osoby, które odgadły prawidłowo:</span>
-                            <div id="hostListRoundWinners" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Osoby, które odgadły prawidłowo (+1 pkt):</span>
+                            <div id="listHostRoundWinners" class="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                                 <!-- Dynamic Winners -->
                             </div>
                         </div>
 
                         <div class="w-full pt-4 border-t border-slate-800">
                             <button onclick="hostNextCard()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-black uppercase tracking-wider rounded-2xl transition shadow-xl">
-                                ➡️ Przejdź Do Następnej Karty
+                                ➡️ Przejdź Do Następnej Osoby
                             </button>
                         </div>
                     </div>
@@ -339,7 +338,7 @@
             <!-- Global Scoreboard Table -->
             <div class="glass-panel rounded-2xl p-5 border border-slate-800 space-y-3">
                 <h4 class="text-xs font-extrabold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-                    🏆 Tabela Wyników na Żywo
+                    🏆 Tabela Wyników na Żywo (Leaderboard)
                 </h4>
                 <div id="hostGlobalScoreboard" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <!-- Dynamic Scoreboard -->
@@ -362,7 +361,6 @@
                 </div>
 
                 <div class="space-y-4">
-                    <!-- Room Code Entry -->
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                             1. Kod Pokoju (4 cyfry)
@@ -381,7 +379,6 @@
                         2. Podaj Swoje Imię:
                     </span>
 
-                    <!-- Option A: Choose from Select Dropdown -->
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-400 mb-1">Wybierz z listy zarejestrowanych:</label>
                         <select id="playerSelectName" onchange="syncPlayerNameFromSelect()" class="w-full px-4 py-3 rounded-2xl glass-input text-sm font-bold text-slate-100">
@@ -391,7 +388,6 @@
 
                     <div class="text-center text-xs text-slate-500 font-bold uppercase">LUB</div>
 
-                    <!-- Option B: Text Input Field -->
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-400 mb-1">Wpisz na klawiaturze:</label>
                         <input type="text" id="playerTextInputName" placeholder="Twój pseudonim / Imię..." class="w-full px-4 py-3 rounded-2xl glass-input text-sm font-bold">
@@ -406,7 +402,7 @@
             <!-- STEP 3B: PLAYER LIVE GAMEPLAY SCREEN (PHONE OPTIMIZED) -->
             <div id="playerStepGame" class="hidden glass-panel rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 border border-slate-700/60">
                 
-                <!-- Header -->
+                <!-- Player Header Bar -->
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div>
                         <span class="text-[10px] font-extrabold uppercase text-purple-400 block">Gracz</span>
@@ -418,11 +414,11 @@
                     </div>
                 </div>
 
-                <!-- DEDICATED LARGE FACTS SECTION FOR PHONES -->
+                <!-- PHONE FACTS SECTION -->
                 <div class="bg-slate-950/90 p-4 rounded-2xl border border-indigo-500/40 space-y-3 shadow-inner">
                     <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                         <span class="text-xs font-black uppercase text-indigo-400 tracking-wider flex items-center gap-1.5">
-                            💡 AKTUALNE PODPOWIEDZI
+                            💡 ODKRYTE FAKTY
                         </span>
                         <span id="playerRevealedFactsBadge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                             Fakt 1 z 3
@@ -432,32 +428,32 @@
                     <div id="playerFactsContainer" class="space-y-2.5">
                         <!-- Fact 1 Box -->
                         <div id="pFactBox1" class="p-3.5 rounded-xl bg-slate-900 border border-indigo-500/40 transition-all">
-                            <span class="text-[10px] font-black uppercase text-indigo-400 block mb-1">Fakt #1 (Za 3 pkt)</span>
+                            <span class="text-[10px] font-black uppercase text-indigo-400 block mb-1">Fakt #1</span>
                             <p id="pFactText1" class="text-sm font-bold text-white leading-snug">Oczekiwanie...</p>
                         </div>
 
                         <!-- Fact 2 Box -->
                         <div id="pFactBox2" class="p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-500 opacity-50 transition-all">
-                            <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">Fakt #2 (Za 2 pkt)</span>
+                            <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">Fakt #2</span>
                             <p id="pFactText2" class="text-sm font-bold leading-snug">🔒 Oczekiwanie na odsłonięcie...</p>
                         </div>
 
                         <!-- Fact 3 Box -->
                         <div id="pFactBox3" class="p-3.5 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-500 opacity-50 transition-all">
-                            <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">Fakt #3 (Za 1 pkt)</span>
+                            <span class="text-[10px] font-black uppercase text-slate-400 block mb-1">Fakt #3</span>
                             <p id="pFactText3" class="text-sm font-bold leading-snug">🔒 Oczekiwanie na odsłonięcie...</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- VOTING SECTION: TOUCH TILES FOR PHONE -->
+                <!-- VOTING SECTION FOR PHONE -->
                 <div id="playerVoteSection" class="space-y-2.5">
                     <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-200">
-                        Kto Twoim zdaniem to napisał? Kliknij poniżej:
+                        Kto Twoim zdaniem to napisał? Kliknij:
                     </label>
 
                     <div id="playerGuessList" class="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto p-1">
-                        <!-- Candidate Tiles generated dynamically -->
+                        <!-- Dynamic Buttons -->
                     </div>
 
                     <button id="btnPlayerSubmitVote" onclick="playerSubmitVote()" disabled class="w-full py-4 mt-2 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-600 disabled:opacity-30 disabled:cursor-not-allowed hover:from-indigo-400 hover:to-pink-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl transition transform active:scale-95">
@@ -465,16 +461,16 @@
                     </button>
                 </div>
 
-                <!-- Vote Confirmation Message -->
+                <!-- Vote Confirmed Message -->
                 <div id="playerVoteConfirmed" class="hidden bg-emerald-950/90 border border-emerald-500/40 p-4 rounded-2xl text-center space-y-1 my-2">
                     <span class="text-2xl">✅</span>
                     <h4 class="text-sm font-extrabold text-emerald-300">Głos Został Zarejestrowany!</h4>
-                    <p class="text-xs text-slate-300">Możesz zmienić swój typ wyżej lub czekać na rozstrzygnięcie Prowadzącego.</p>
+                    <p class="text-xs text-slate-300">Możesz zmienić typ wyżej lub czekać na rozstrzygnięcie Prowadzącego.</p>
                 </div>
 
-                <!-- AUTOMATIC ROUND RESULT ANNOUNCEMENT ON PHONE -->
+                <!-- ROUND RESULT ANNOUNCEMENT SCREEN ON PHONE -->
                 <div id="playerRoundResult" class="hidden p-5 rounded-2xl text-center space-y-2 my-2 shadow-2xl transition-all">
-                    <!-- Dynamic Result: Correct or Incorrect -->
+                    <!-- Dynamic Result: Vibrant Green Correct or Red Incorrect -->
                 </div>
             </div>
 
@@ -484,11 +480,11 @@
 
     <!-- Footer -->
     <footer class="w-full text-center py-3 border-t border-slate-800/80 text-xs text-slate-500 bg-slate-950/50">
-        <p>Karta Tajemnic — Teleturniej Integracyjny Multiplayer</p>
+        <p>Karta Tajemnic — Teleturniej Integracyjny Multiplayer P2P</p>
     </footer>
 
-    <!-- Toast Alert Box -->
-    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-indigo-500/40 text-white px-5 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300">
+    <!-- Toast Notification Box -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-900 border border-indigo-500/40 text-white px-5 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
         <span id="toastIcon" class="text-lg">✨</span>
         <span id="toastMsg" class="text-xs font-semibold">Komunikat...</span>
     </div>
@@ -507,7 +503,7 @@
         let currentCardIndex = 0;
         let currentRevealedFacts = 1;
         let isAnswerRevealed = false;
-        let playerVotes = {}; // { playerName: { guessName, factStepWhenVoted } }
+        let playerVotes = {}; // { playerName: guessName }
         let globalScores = {}; // { playerName: totalPoints }
 
         // Player Specific State
@@ -679,13 +675,12 @@
             ];
             participantsData.forEach(p => globalScores[p.name] = 0);
             renderHostCardList();
-            showToast("Wgrano przykładowe karty!", "⚡");
+            showToast("Wgrano przykładowe osoby!", "⚡");
         }
 
         /* ==================== 1B. HOST: CREATE WEBRTC ROOM & QR ==================== */
         function hostCreateRoom() {
             playSound('click');
-            // Generate 4 digit room code
             const code = Math.floor(1000 + Math.random() * 9000).toString();
             roomCode = code;
 
@@ -701,12 +696,10 @@
                 document.getElementById('headerRoomCode').innerText = roomCode;
                 document.getElementById('displayHostCode').innerText = roomCode;
 
-                // Generate QR Code URL
                 const joinUrl = `${window.location.origin}${window.location.pathname}?room=${roomCode}`;
                 const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(joinUrl)}`;
                 document.getElementById('hostQrCodeImg').src = qrApiUrl;
 
-                // Shuffle participants for random ordering
                 participantsData = participantsData.sort(() => Math.random() - 0.5);
 
                 renderHostGameScreen();
@@ -720,7 +713,6 @@
 
                     const current = participantsData[currentCardIndex];
 
-                    // Send complete game state & player names list to newly connected phone
                     conn.send({
                         type: 'ROOM_CONNECTED',
                         players: participantsData.map(p => p.name),
@@ -772,7 +764,6 @@
 
             document.getElementById('hostRevealedAuthorName').innerText = current.name;
 
-            // Reset Round States
             currentRevealedFacts = 1;
             isAnswerRevealed = false;
             playerVotes = {};
@@ -780,11 +771,9 @@
             updateFactRevealBoxesUI();
             updateHostVotesCounter();
 
-            // Show question view, hide answer view
             document.getElementById('hostQuestionView').classList.remove('hidden');
             document.getElementById('hostAnswerView').classList.add('hidden');
 
-            // Broadcast state to all connected phones
             broadcastToPlayers({
                 type: 'ROUND_STATE',
                 cardIdx: currentCardIndex,
@@ -822,30 +811,30 @@
             const btnReveal = document.getElementById('btnHostRevealNext');
 
             if (currentRevealedFacts >= 2) {
-                box2.className = "p-4.5 rounded-2xl bg-slate-900/90 border border-indigo-500/40 transition-all duration-500 flex items-start gap-3 shadow-md";
+                box2.className = "p-4 rounded-2xl bg-slate-900/90 border border-indigo-500/40 transition-all duration-500 flex items-start gap-3 shadow-md";
                 badge2.className = "w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow";
             } else {
-                box2.className = "p-4.5 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]";
+                box2.className = "p-4 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]";
                 badge2.className = "w-8 h-8 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-sm shrink-0";
             }
 
             if (currentRevealedFacts >= 3) {
-                box3.className = "p-4.5 rounded-2xl bg-slate-900/90 border border-indigo-500/40 transition-all duration-500 flex items-start gap-3 shadow-md";
+                box3.className = "p-4 rounded-2xl bg-slate-900/90 border border-indigo-500/40 transition-all duration-500 flex items-start gap-3 shadow-md";
                 badge3.className = "w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow";
             } else {
-                box3.className = "p-4.5 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]";
+                box3.className = "p-4 rounded-2xl bg-slate-950/40 border border-slate-800 transition-all duration-500 flex items-start gap-3 opacity-30 blur-[2px]";
                 badge3.className = "w-8 h-8 rounded-xl bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-sm shrink-0";
             }
 
             if (currentRevealedFacts === 1) {
                 btnReveal.disabled = false;
-                btnReveal.innerHTML = `🔍 <span>Odsłoń Fakt #2</span>`;
+                document.getElementById('btnRevealText').innerText = "Odsłoń Fakt 2";
             } else if (currentRevealedFacts === 2) {
                 btnReveal.disabled = false;
-                btnReveal.innerHTML = `🔍 <span>Odsłoń Fakt #3</span>`;
+                document.getElementById('btnRevealText').innerText = "Odsłoń Fakt 3";
             } else {
                 btnReveal.disabled = true;
-                btnReveal.innerHTML = `✅ Wszystkie fakty odsłonięte`;
+                document.getElementById('btnRevealText').innerText = "Wszystkie fakty odsłonięte";
             }
         }
 
@@ -853,7 +842,6 @@
             if (isAnswerRevealed) return;
             isAnswerRevealed = true;
 
-            // Switch to clean answer view
             document.getElementById('hostQuestionView').classList.add('hidden');
             document.getElementById('hostAnswerView').classList.remove('hidden');
 
@@ -863,36 +851,32 @@
             const currentAuthor = participantsData[currentCardIndex].name;
             const roundWinners = [];
 
-            // Calculate score points for all players
-            Object.entries(playerVotes).forEach(([voterName, voteInfo]) => {
-                if (voteInfo.guessName.toLowerCase().trim() === currentAuthor.toLowerCase().trim()) {
-                    let pts = 1;
-                    if (voteInfo.factStepWhenVoted === 1) pts = 3;
-                    else if (voteInfo.factStepWhenVoted === 2) pts = 2;
-
-                    globalScores[voterName] = (globalScores[voterName] || 0) + pts;
-                    roundWinners.push({ name: voterName, pts });
+            // Exactly +1 point per correct answer in this round
+            Object.entries(playerVotes).forEach(([voterName, guessName]) => {
+                if (guessName.toLowerCase().trim() === currentAuthor.toLowerCase().trim()) {
+                    globalScores[voterName] = (globalScores[voterName] || 0) + 1;
+                    roundWinners.push({ name: voterName, pts: 1 });
                 }
             });
 
-            // Render Round Winners List on Host Screen
+            // Render Round Winners List
             const winnersContainer = document.getElementById('listHostRoundWinners');
             winnersContainer.innerHTML = '';
 
             if (roundWinners.length === 0) {
-                winnersContainer.innerHTML = `<span class="text-xs text-rose-400 font-semibold">Nikt nie odgadł prawidłowo tej karty! 😅</span>`;
+                winnersContainer.innerHTML = `<span class="text-xs text-rose-400 font-semibold">Nikt nie odgadł prawidłowo w tej rundzie! 😅</span>`;
             } else {
                 roundWinners.forEach(w => {
                     const badge = document.createElement('span');
                     badge.className = "px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-bold";
-                    badge.innerText = `🎉 ${w.name} (+${w.pts} pkt)`;
+                    badge.innerText = `🎉 ${w.name} (+1 pkt)`;
                     winnersContainer.appendChild(badge);
                 });
             }
 
             renderGlobalScoreboard();
 
-            // Broadcast Reveal result & updated scores to ALL PHONES
+            // Broadcast Reveal result to ALL PHONES
             broadcastToPlayers({
                 type: 'GRAND_REVEAL',
                 correctAuthor: currentAuthor,
@@ -906,8 +890,8 @@
             if (currentCardIndex < participantsData.length - 1) {
                 currentCardIndex++;
             } else {
-                currentCardIndex = 0; // Loop back
-                showToast("Przejście do pierwszej karty!", "🔄");
+                currentCardIndex = 0;
+                showToast("Przejście do pierwszej osoby!", "🔄");
             }
             renderHostGameScreen();
         }
@@ -942,10 +926,7 @@
                 updateConnectedCount();
                 updateHostVotesCounter();
             } else if (data.type === 'SUBMIT_VOTE') {
-                playerVotes[data.playerName] = {
-                    guessName: data.guessName,
-                    factStepWhenVoted: data.factStepWhenVoted
-                };
+                playerVotes[data.playerName] = data.guessName;
                 updateHostVotesCounter();
             }
         }
@@ -994,7 +975,6 @@
 
         function handlePlayerIncomingData(data) {
             if (data.type === 'ROOM_CONNECTED') {
-                // Populate dropdown option names from host
                 const select = document.getElementById('playerSelectName');
                 select.innerHTML = '<option value="">-- Wybierz Swoje Imię --</option>';
                 
@@ -1008,7 +988,6 @@
                 document.getElementById('playerNameSelectGroup').classList.remove('hidden');
                 showToast("Połączono! Wpisz lub wybierz swoje imię.", "✅");
 
-                // Render current round state if host already started
                 if (data.roundState) {
                     renderPlayerLiveFacts(data.roundState);
                     renderPlayerCandidateButtons(data.players);
@@ -1059,7 +1038,6 @@
 
             document.getElementById('playerHeaderName').innerText = myPlayerName;
 
-            // Notify host of registration
             if (playerConn) {
                 playerConn.send({
                     type: 'PLAYER_REGISTER',
@@ -1081,7 +1059,6 @@
         function updatePlayerFactVisibilityUI(data = {}) {
             document.getElementById('playerRevealedFactsBadge').innerText = `Fakt ${currentRevealedFacts} z 3`;
 
-            const box1 = document.getElementById('pFactBox1');
             const box2 = document.getElementById('pFactBox2');
             const box3 = document.getElementById('pFactBox3');
 
@@ -1144,8 +1121,7 @@
                 playerConn.send({
                     type: 'SUBMIT_VOTE',
                     playerName: myPlayerName,
-                    guessName: mySelectedGuess,
-                    factStepWhenVoted: currentRevealedFacts
+                    guessName: mySelectedGuess
                 });
             }
 
@@ -1154,7 +1130,6 @@
         }
 
         function renderPlayerRoundResultUI(data) {
-            // Hide active voting section and confirmation box
             document.getElementById('playerVoteSection').classList.add('hidden');
             document.getElementById('playerVoteConfirmed').classList.add('hidden');
 
@@ -1162,9 +1137,7 @@
             resContainer.classList.remove('hidden');
 
             const isWinner = data.roundWinners.some(w => w.name === myPlayerName);
-            const myWinObj = data.roundWinners.find(w => w.name === myPlayerName);
 
-            // Update my current score from broadcasted global score table
             if (data.globalScores && data.globalScores[myPlayerName] !== undefined) {
                 myCurrentScore = data.globalScores[myPlayerName];
                 document.getElementById('playerScoreDisplay').innerText = `${myCurrentScore} pkt`;
@@ -1177,12 +1150,12 @@
                 resContainer.className = "p-5 rounded-2xl bg-emerald-950/90 border border-emerald-500/50 text-center space-y-3 shadow-xl";
                 resContainer.innerHTML = `
                     <span class="text-4xl block">🎉</span>
-                    <h3 class="text-lg font-black text-emerald-300">SUKCES! ZGADŁEŚ(-AŚ)!</h3>
+                    <h3 class="text-lg font-black text-emerald-300">BRAWO! +1 PKT 🎉</h3>
                     <p class="text-xs text-slate-200 leading-relaxed">
-                        To rzeczywiście była karta osoby: <strong class="text-white font-black text-sm block mt-0.5">${escapeHTML(data.correctAuthor)}</strong>
+                        To rzeczywiście była osoba: <strong class="text-white font-black text-sm block mt-0.5">${escapeHTML(data.correctAuthor)}</strong>
                     </p>
                     <div class="inline-block px-4 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 font-extrabold text-xs border border-emerald-500/40">
-                        +${myWinObj.pts} pkt za tę rundę!
+                        Suma punktów: ${myCurrentScore} pkt
                     </div>
                 `;
 
@@ -1193,14 +1166,14 @@
 
                 resContainer.className = "p-5 rounded-2xl bg-rose-950/90 border border-rose-500/50 text-center space-y-3 shadow-xl";
                 resContainer.innerHTML = `
-                    <span class="text-4xl block">😅</span>
-                    <h3 class="text-lg font-black text-rose-300">NIESTETY! PUDŁO</h3>
+                    <span class="text-4xl block">❌</span>
+                    <h3 class="text-lg font-black text-rose-300">NIESTETY! ❌</h3>
                     <p class="text-xs text-slate-200 leading-relaxed">
                         ${myGuessText}<br>
-                        A to była karta osoby: <strong class="text-white font-black text-sm block mt-1">${escapeHTML(data.correctAuthor)}</strong>
+                        Prawidłowa odpowiedź: <strong class="text-white font-black text-sm block mt-1">${escapeHTML(data.correctAuthor)}</strong>
                     </p>
                     <div class="inline-block px-3 py-1 rounded-xl bg-rose-500/20 text-rose-300 font-bold text-xs border border-rose-500/30">
-                        0 pkt w tej rundzie
+                        0 pkt w tej rundzie (Łącznie: ${myCurrentScore} pkt)
                     </div>
                 `;
             }
