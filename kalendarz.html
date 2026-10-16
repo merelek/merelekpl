@@ -7,7 +7,7 @@
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS dla połączeń na żywo P2P -->
+  <!-- PeerJS dla bezpośrednich połączeń P2P (WebRTC) -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -54,55 +54,55 @@
       <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 tracking-tight cursor-pointer" onclick="showView('view-mode-select')">
         🕵️ Kto To Jest?
       </h1>
-      <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej z tajemnicami</p>
+      <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej bez serwerów (P2P)</p>
     </header>
 
     <!-- WIDOK 1: WYBÓR TRYBU -->
     <main id="view-mode-select" class="space-y-6 my-auto">
       <div class="text-center space-y-2">
         <h2 class="text-2xl font-bold">Wybierz opcję:</h2>
-        <p class="text-slate-400 text-sm">Najpierw wszyscy tworzą swoje karty, a potem Prowadzący pobiera je jednym kliknięciem!</p>
+        <p class="text-slate-400 text-sm">Prowadzący tworzy pokój na komputerze, a pozostali wysyłają swoje karty i zgadują na telefonach!</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-        <!-- Opcja 1: Tworzenie Karty -->
-        <button onclick="selectRole('creator')" class="group p-6 rounded-3xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 border border-amber-500/30 hover:border-amber-400 transition text-left hover:scale-[1.02] shadow-xl">
-          <div class="text-3xl mb-2">📝</div>
-          <h3 class="text-xl font-bold text-white group-hover:text-amber-300">1. Stwórz swoją kartę</h3>
-          <p class="text-amber-200/70 text-xs mt-2">Dla każdego uczestnika. Wpisz swoje imię, 3 tajemnicze fakty i wyślij do chmury.</p>
-        </button>
-
-        <!-- Opcja 2: Komputer Główny -->
+        <!-- Opcja 1: Komputer Główny -->
         <button onclick="selectRole('host')" class="group p-6 rounded-3xl bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 hover:border-indigo-400 transition text-left hover:scale-[1.02] shadow-xl">
           <div class="text-3xl mb-2">💻</div>
-          <h3 class="text-xl font-bold text-white group-hover:text-indigo-300">2. Komputer Główny</h3>
-          <p class="text-indigo-200/70 text-xs mt-2">Dla Prowadzącego. Pobierz karty z chmury jednym przyciskiem i prowadź grę.</p>
+          <h3 class="text-xl font-bold text-white group-hover:text-indigo-300">1. Komputer Główny</h3>
+          <p class="text-indigo-200/70 text-xs mt-2">Dla Prowadzącego. Generuje Kod Pokoju i odbiera karty graczy na żywo.</p>
+        </button>
+
+        <!-- Opcja 2: Tworzenie Karty -->
+        <button onclick="selectRole('creator')" class="group p-6 rounded-3xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 border border-amber-500/30 hover:border-amber-400 transition text-left hover:scale-[1.02] shadow-xl">
+          <div class="text-3xl mb-2">📝</div>
+          <h3 class="text-xl font-bold text-white group-hover:text-amber-300">2. Stwórz swoją kartę</h3>
+          <p class="text-amber-200/70 text-xs mt-2">Dla uczestników. Wpisz swoje imię, 3 tajemnicze fakty i wyślij prosto na komputer.</p>
         </button>
 
         <!-- Opcja 3: Telefon Dołącz -->
         <button onclick="selectRole('player')" class="group p-6 rounded-3xl bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border border-emerald-500/30 hover:border-emerald-400 transition text-left hover:scale-[1.02] shadow-xl">
           <div class="text-3xl mb-2">📱</div>
-          <h3 class="text-xl font-bold text-white group-hover:text-emerald-300">3. Telefon (Gracz)</h3>
-          <p class="text-emerald-200/70 text-xs mt-2">Dla graczy w trakcie teleturnieju. Dołącz za pomocą 4-cyfrowego kodu pokoju.</p>
+          <h3 class="text-xl font-bold text-white group-hover:text-emerald-300">3. Telefon (Gra)</h3>
+          <p class="text-emerald-200/70 text-xs mt-2">Dla graczy w trakcie turnieju. Oglądaj podpowiedzi i typuj na żywo na ekranie.</p>
         </button>
       </div>
     </main>
 
 
     <!-- ============================================================================================== -->
-    <!-- WIDOK CREATORA: TWORZENIE SWOJEJ KARTY I WYSYŁKA DO CHMURY -->
+    <!-- WIDOK CREATORA: WYSYŁANIE KARTY BEZPOŚREDNIO P2P DO KOMPUTERA -->
     <!-- ============================================================================================== -->
     <section id="view-card-creator" class="hidden space-y-5 my-auto max-w-lg mx-auto w-full">
       <div class="glass-card p-6 rounded-3xl space-y-4 border border-amber-500/30">
         <div class="text-center">
-          <h2 class="text-2xl font-bold text-amber-400">📝 Stwórz swoją Kartę Tajemnic</h2>
-          <p class="text-slate-400 text-xs mt-1">Wpisz prawdę o sobie, której inni mogą nie wiedzieć!</p>
+          <h2 class="text-2xl font-bold text-amber-400">📝 Stwórz i Wyślij Kartę</h2>
+          <p class="text-slate-400 text-xs mt-1">Wpisz prawdę o sobie i wyślij bezpośrednio do Prowadzącego!</p>
         </div>
 
-        <form onsubmit="submitCardToCloud(event)" class="space-y-3.5">
+        <form onsubmit="submitCardDirectP2P(event)" class="space-y-3.5">
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Kod Wydarzenia / Imprezy (wymyślony przez Prowadzącego)</label>
-            <input id="create-event-code" type="text" placeholder="np. IMPREZA2026" required class="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-4 py-2.5 text-amber-300 font-bold tracking-wider focus:outline-none uppercase text-center">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Kod Pokoju (4 cyfry z komputera Prowadzącego)</label>
+            <input id="create-room-code" type="text" maxlength="6" placeholder="np. 4821" required class="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-4 py-2.5 text-amber-300 font-mono font-bold tracking-widest focus:outline-none uppercase text-center text-xl">
           </div>
 
           <div>
@@ -125,14 +125,19 @@
             <input id="create-fact3" type="text" placeholder="np. Chcę odwiedzić Japonię" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
           </div>
 
-          <button id="btn-submit-cloud" type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-lg rounded-2xl shadow-xl transition transform active:scale-95">
-            ☁️ Wyślij moją kartę do chmury
+          <button id="btn-submit-card-p2p" type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-lg rounded-2xl shadow-xl transition transform active:scale-95">
+            🚀 Wyślij bezpośrednio do Prowadzącego
           </button>
         </form>
 
-        <div id="creator-success-msg" class="hidden p-4 bg-emerald-950/80 border border-emerald-500/50 rounded-2xl text-center space-y-1">
-          <p class="text-emerald-300 font-bold">✅ Karta wysłana pomyślnie!</p>
-          <p class="text-xs text-slate-300">Prowadzący pobierze ją na komputer przyciskiem pobierania.</p>
+        <div id="creator-status-msg" class="hidden p-4 rounded-2xl text-center space-y-1">
+          <p id="creator-status-text" class="font-bold text-sm">...</p>
+        </div>
+
+        <div class="pt-2 border-t border-slate-800 text-center">
+          <button onclick="copyCardCodeToClipboard()" class="text-xs text-slate-400 hover:text-amber-300 underline">
+            📋 Lub skopiuj kod tekstowy (do przesłania na czacie)
+          </button>
         </div>
       </div>
     </section>
@@ -144,89 +149,63 @@
     <section id="view-host-setup" class="hidden space-y-6">
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
-          <h2 class="text-2xl font-bold text-indigo-400">Panel Prowadzącego: Przygotowanie Gry</h2>
-          <p class="text-slate-400 text-xs">Pobierz karty przesłane przez graczy z chmury lub dodaj ręcznie.</p>
+          <h2 class="text-2xl font-bold text-indigo-400">Panel Prowadzącego</h2>
+          <p class="text-slate-400 text-xs">Utwórz pokój, a gracze wyślą swoje karty ze swoich telefonów na żywo!</p>
         </div>
         <button onclick="loadSampleData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition">
-          ⚡ Przykładowe karty
+          ⚡ Załaduj przykładowe karty
         </button>
       </div>
 
-      <!-- SEKCJA AUTOMATYCZNEGO POBIERANIA Z CHMURY -->
-      <div class="glass-card p-5 rounded-2xl space-y-3 border border-indigo-500/30 bg-indigo-950/20">
-        <h3 class="font-bold text-indigo-300 text-sm flex items-center gap-2">
-          <span>☁️ Automatyczne Pobieranie Kart z Chmury</span>
-        </h3>
-        <div class="flex gap-3">
-          <input id="host-fetch-code" type="text" placeholder="Kod Wydarzenia (np. IMPREZA2026)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold uppercase focus:outline-none focus:border-indigo-500">
-          <button onclick="fetchCardsFromCloud()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2">
-            <span>📥 Pobierz karty z chmury</span>
-          </button>
-        </div>
-        <p class="text-[11px] text-slate-400">Wystarczy kliknąć przycisk, a wszystkie karty utworzone przez uczestników pod tym kodem wczytają się same!</p>
+      <!-- TWORZENIE POKOJU -->
+      <div id="host-init-container" class="glass-card p-6 rounded-2xl text-center space-y-4">
+        <h3 class="font-bold text-lg text-slate-200">Krok 1: Aktywuj Pokój Do Odbierania Kart</h3>
+        <p class="text-slate-400 text-xs">Uruchom połączenie, aby gracze mogli wysyłać karty podając Twój Kod Pokoju.</p>
+        <button onclick="initHostRoom()" class="px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition">
+          📡 Aktywuj Pokój i Generuj Kod
+        </button>
       </div>
 
-      <!-- Formularz Ręczny -->
+      <!-- KOD POKOJU DLA GRACZY -->
+      <div id="host-room-info-box" class="hidden glass-card p-5 rounded-2xl space-y-3 text-center border border-emerald-500/40 bg-emerald-950/20">
+        <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Pokój Otwarty &bull; Podaj ten kod graczom:</span>
+        <div id="host-room-code-display" class="text-5xl font-black text-amber-400 tracking-wider font-mono">
+          ----
+        </div>
+        <p class="text-xs text-slate-300">Gracze wchodzą w zakładkę <b>„2. Stwórz swoją kartę”</b> i wpisują ten kod na telefonie.</p>
+      </div>
+
+      <!-- AWARYJNE PASTE Z CZATU -->
       <details class="glass-card p-4 rounded-2xl text-xs text-slate-300">
-        <summary class="font-bold cursor-pointer text-slate-300 hover:text-white">➕ Lub dodaj kartę ręcznie na tym komputerze</summary>
-        <form onsubmit="addHostCard(event)" class="space-y-3 mt-3 pt-3 border-t border-slate-800">
-          <input id="input-host-name" type="text" placeholder="Imię" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-            <input id="input-host-fact1" type="text" placeholder="Fakt 1" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
-            <input id="input-host-fact2" type="text" placeholder="Fakt 2" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
-            <input id="input-host-fact3" type="text" placeholder="Fakt 3" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
-          </div>
-          <button type="submit" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700">Dodaj kartę</button>
-        </form>
+        <summary class="font-bold cursor-pointer text-slate-300 hover:text-white">📋 Masz kody skopiowane z czatu? Wklej je tutaj</summary>
+        <div class="space-y-2 mt-3 pt-3 border-t border-slate-800">
+          <textarea id="host-batch-paste-input" rows="3" placeholder="Wklej wiadomości z czatu (np. KARTA#Kasia#Fakt1|Fakt2|Fakt3)..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"></textarea>
+          <button onclick="parseBatchPastedCards()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700">
+            Załaduj wklejone karty
+          </button>
+        </div>
       </details>
 
-      <!-- Lista dodanych kart -->
+      <!-- Lista odbieranych kart -->
       <div class="space-y-3">
         <div class="flex justify-between items-center">
-          <h3 class="font-bold text-slate-300">Pobrane/Dodane Karty (<span id="host-card-count">0</span>):</h3>
+          <h3 class="font-bold text-slate-300">Odebrane Karty (<span id="host-card-count">0</span>):</h3>
           <button onclick="clearAllCards()" class="text-xs text-rose-400 hover:underline">Wyczyść listę</button>
         </div>
         <div id="host-card-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
-          <!-- Karty z chmury wczytują się tutaj -->
+          <!-- Karty z telefonów wskakują tu dynamicznie -->
         </div>
       </div>
 
-      <!-- Generowanie Pokoju -->
+      <!-- Rozpocznij grę -->
       <div class="pt-4 border-t border-slate-800 text-center">
-        <button id="btn-create-room" onclick="initHostRoom()" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-2xl shadow-xl transition transform active:scale-95 disabled:opacity-50">
-          🚀 Utwórz Pokój i Rozpocznij Grać
-        </button>
-      </div>
-    </section>
-
-    <!-- HOST STEP 2: POCZEKALNIA Z KODEM POKOJU -->
-    <section id="view-host-lobby" class="hidden text-center space-y-6 my-auto">
-      <div class="glass-card p-8 rounded-3xl space-y-6 max-w-lg mx-auto">
-        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Pokój Pokazu Gotowy</span>
-        <h2 class="text-xl text-slate-300">Kod Pokoju dla Telefonów:</h2>
-        
-        <div id="host-room-code-display" class="text-6xl font-black text-amber-400 tracking-wider bg-slate-900/80 py-4 rounded-2xl border border-amber-500/30">
-          ----
-        </div>
-
-        <div id="qr-container" class="flex flex-col items-center justify-center pt-2">
-          <img id="qr-code-img" src="" alt="Kod QR" class="w-44 h-44 rounded-xl border-2 border-slate-700 shadow-lg hidden">
-        </div>
-
-        <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-          <p class="text-slate-300 text-sm font-semibold">Dołączeni Gracze na Telefonach: <span id="host-connected-count" class="text-emerald-400 font-bold text-lg">0</span></p>
-          <div id="host-connected-players-list" class="flex flex-wrap gap-2 justify-center mt-3 text-xs text-slate-400">
-            <!-- Imiona graczy -->
-          </div>
-        </div>
-
-        <button onclick="startHostGame()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-xl shadow-lg transition">
+        <button id="btn-start-show" onclick="startHostGame()" disabled class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-lg rounded-2xl shadow-xl transition transform active:scale-95 disabled:opacity-30">
           🎬 Rozpocznij Teleturniej!
         </button>
       </div>
     </section>
 
-    <!-- HOST STEP 3: EKRAN TELETIURNIEJU (GRA NA ŻYWO) -->
+    <!-- HOST STEP 2: EKRAN TELETIURNIEJU (GRA NA ŻYWO) -->
     <section id="view-host-game" class="hidden space-y-6">
       <div class="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
         <div>
@@ -262,7 +241,6 @@
           </div>
         </div>
 
-        <!-- PRZYCISKI STEROWANIA FAKTAMI -->
         <div class="grid grid-cols-2 gap-3 pt-2">
           <button id="btn-reveal-fact-2" onclick="revealFact(2)" class="py-3 bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold rounded-xl border border-indigo-500/30 transition disabled:opacity-30">
             🔓 Odsłoń Fakt #2
@@ -272,7 +250,6 @@
           </button>
         </div>
 
-        <!-- PRZYCISK ODKRYCIA PRAWDY -->
         <button id="btn-reveal-answer" onclick="revealAnswer()" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xl rounded-2xl shadow-xl transition transform active:scale-95">
           🎉 ODKRYJ KTO TO!
         </button>
@@ -316,7 +293,7 @@
     <section id="view-player-join" class="hidden space-y-6 my-auto">
       <div class="glass-card p-6 rounded-3xl space-y-5 max-w-md mx-auto">
         <div class="text-center">
-          <h2 class="text-2xl font-bold text-emerald-400">Dołącz do Teleturnieju</h2>
+          <h2 class="text-2xl font-bold text-emerald-400">Dołącz do Zgadywania</h2>
           <p class="text-slate-400 text-xs mt-1">Wpisz kod podany na ekranie komputera</p>
         </div>
 
@@ -415,7 +392,7 @@
 
     <!-- STOPKA -->
     <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 mt-6">
-      Kto to jest? — Karta Tajemnic &bull; Gra Towarzyska Chmura & P2P
+      Kto to jest? — Karta Tajemnic &bull; 100% Bezpośrednie Połączenie P2P
     </footer>
   </div>
 
@@ -480,7 +457,7 @@
     function showView(viewId) {
       const views = [
         'view-mode-select', 'view-card-creator', 'view-host-setup', 
-        'view-host-lobby', 'view-host-game', 'view-player-join', 'view-player-game'
+        'view-host-game', 'view-player-join', 'view-player-game'
       ];
       views.forEach(id => {
         const el = document.getElementById(id);
@@ -497,102 +474,162 @@
       else showView('view-player-join');
     }
 
-    // --- LOGIKA TWORZENIA KARTY I OBSŁUGA CHMURY ---
-    async function submitCardToCloud(e) {
+    // --- BEZPOŚREDNIE WYSYŁANIE KARTY DANYCH (P2P) ---
+    function submitCardDirectP2P(e) {
       e.preventDefault();
       playSound('click');
 
-      const btn = document.getElementById('btn-submit-cloud');
-      btn.disabled = true;
-      btn.innerText = '⏳ Wysyłanie do chmury...';
-
-      const eventCode = document.getElementById('create-event-code').value.trim().toUpperCase();
+      const targetCode = document.getElementById('create-room-code').value.trim().toUpperCase();
       const name = document.getElementById('create-name').value.trim();
       const f1 = document.getElementById('create-fact1').value.trim();
       const f2 = document.getElementById('create-fact2').value.trim();
       const f3 = document.getElementById('create-fact3').value.trim();
 
-      const cardData = { name, facts: [f1, f2, f3] };
+      const btn = document.getElementById('btn-submit-card-p2p');
+      const msgBox = document.getElementById('creator-status-msg');
+      const msgText = document.getElementById('creator-status-text');
 
-      try {
-        const url = `https://jsonstorage.net/api/items/${encodeURIComponent(eventCode)}`;
-        let currentCards = [];
-        
-        try {
-          const res = await fetch(url);
-          if (res.ok) {
-            const fetched = await res.json();
-            if (Array.isArray(fetched)) currentCards = fetched;
-          }
-        } catch(err) {}
+      btn.disabled = true;
+      btn.innerText = '⏳ Łączenie z Prowadzącym...';
+      msgBox.classList.remove('hidden');
+      msgBox.className = 'p-4 rounded-2xl text-center bg-slate-900 border border-slate-700';
+      msgText.innerText = '📡 Łączenie z komputerem Prowadzącego...';
 
-        currentCards = currentCards.filter(c => c.name !== name);
-        currentCards.push(cardData);
+      const tempPeer = new Peer();
 
-        await fetch(url, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(currentCards)
+      tempPeer.on('open', () => {
+        const targetPeerId = 'ktotojest-room-' + targetCode;
+        const conn = tempPeer.connect(targetPeerId);
+
+        conn.on('open', () => {
+          conn.send({
+            type: 'NEW_CARD_SUBMISSION',
+            card: { name, facts: [f1, f2, f3] }
+          });
+
+          msgBox.className = 'p-4 rounded-2xl text-center bg-emerald-950 border border-emerald-500';
+          msgText.innerText = '✅ Karta dotarła na komputer Prowadzącego!';
+          btn.innerText = '✅ Wysłano Pomyślnie!';
+          playSound('win');
+
+          setTimeout(() => { tempPeer.destroy(); }, 2000);
         });
 
-        document.getElementById('creator-success-msg').classList.remove('hidden');
-        btn.innerText = '✅ Wysłano do chmury!';
-        playSound('win');
-      } catch(err) {
-        alert('Błąd wysyłania do chmury: ' + err.message);
+        conn.on('error', (err) => {
+          msgBox.className = 'p-4 rounded-2xl text-center bg-rose-950 border border-rose-500';
+          msgText.innerText = '❌ Nie udało się połączyć. Sprawdź Kod Pokoju lub czy Prowadzący uruchomił pokój!';
+          btn.disabled = false;
+          btn.innerText = '🚀 Wyślij bezpośrednio do Prowadzącego';
+        });
+      });
+
+      tempPeer.on('error', (err) => {
+        msgBox.className = 'p-4 rounded-2xl text-center bg-rose-950 border border-rose-500';
+        msgText.innerText = '❌ Błąd połączenia P2P: ' + err.message;
         btn.disabled = false;
-        btn.innerText = '☁️ Wyślij moją kartę do chmury';
-      }
+        btn.innerText = '🚀 Wyślij bezpośrednio do Prowadzącego';
+      });
     }
 
-    async function fetchCardsFromCloud() {
-      playSound('click');
-      const eventCode = document.getElementById('host-fetch-code').value.trim().toUpperCase();
-      if (!eventCode) {
-        alert('Wpisz Kod Wydarzenia!');
-        return;
-      }
+    function copyCardCodeToClipboard() {
+      const name = document.getElementById('create-name').value.trim() || 'Nieznany';
+      const f1 = document.getElementById('create-fact1').value.trim() || 'Fakt1';
+      const f2 = document.getElementById('create-fact2').value.trim() || 'Fakt2';
+      const f3 = document.getElementById('create-fact3').value.trim() || 'Fakt3';
 
-      try {
-        const url = `https://jsonstorage.net/api/items/${encodeURIComponent(eventCode)}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Nie znaleziono kart pod tym kodem!');
-
-        const cards = await res.json();
-        if (Array.isArray(cards) && cards.length > 0) {
-          cards.forEach(card => {
-            if (!hostCards.some(c => c.name === card.name)) {
-              hostCards.push(card);
-            }
-          });
-          renderHostCardsList();
-          playSound('win');
-          alert(`Pomyślnie pobrano ${cards.length} kart z chmury!`);
-        } else {
-          alert('Brak kart pod podanym kodem.');
-        }
-      } catch(err) {
-        alert('Błąd pobierania z chmury: ' + err.message);
-      }
+      const codeStr = `KARTA#${name}#${f1}|${f2}|${f3}`;
+      navigator.clipboard.writeText(codeStr);
+      alert('Skopiowano kod do schowka: \n' + codeStr + '\n\nWyślij go Prowadzącemu na czacie!');
     }
 
     // --- LOGIKA HOST ---
-    function addHostCard(e) {
-      e.preventDefault();
+    function initHostRoom() {
       playSound('click');
-      const name = document.getElementById('input-host-name').value.trim();
-      const f1 = document.getElementById('input-host-fact1').value.trim();
-      const f2 = document.getElementById('input-host-fact2').value.trim();
-      const f3 = document.getElementById('input-host-fact3').value.trim();
 
-      if (!name || !f1 || !f2 || !f3) return;
+      const numCode = Math.floor(1000 + Math.random() * 9000);
+      roomCode = numCode.toString();
+      const peerId = 'ktotojest-room-' + roomCode;
 
-      hostCards.push({ name, facts: [f1, f2, f3] });
-      document.getElementById('input-host-name').value = '';
-      document.getElementById('input-host-fact1').value = '';
-      document.getElementById('input-host-fact2').value = '';
-      document.getElementById('input-host-fact3').value = '';
+      peer = new Peer(peerId);
+
+      peer.on('open', (id) => {
+        document.getElementById('host-room-code-display').innerText = roomCode;
+        document.getElementById('host-init-container').classList.add('hidden');
+        document.getElementById('host-room-info-box').classList.remove('hidden');
+      });
+
+      peer.on('connection', (conn) => {
+        conn.on('open', () => { hostConnections[conn.peer] = conn; });
+        conn.on('data', (data) => { handleHostReceivedData(conn, data); });
+        conn.on('close', () => { delete hostConnections[conn.peer]; });
+      });
+
+      peer.on('error', (err) => {
+        if (err.type === 'unavailable-id') initHostRoom();
+        else alert('Błąd połączenia PeerJS: ' + err.message);
+      });
+    }
+
+    function handleHostReceivedData(conn, data) {
+      if (data.type === 'NEW_CARD_SUBMISSION') {
+        const card = data.card;
+        if (card && card.name) {
+          // Zastąp jeśli istnieje lub dodaj nową
+          hostCards = hostCards.filter(c => c.name !== card.name);
+          hostCards.push(card);
+          renderHostCardsList();
+          playSound('reveal');
+        }
+      } else if (data.type === 'JOIN_GAME') {
+        const playerName = data.playerName;
+        let existing = hostPlayers.find(p => p.name === playerName);
+        if (!existing) {
+          existing = { id: conn.peer, name: playerName, score: 0, votedChoice: null };
+          hostPlayers.push(existing);
+        } else {
+          existing.id = conn.peer;
+        }
+
+        conn.send({
+          type: 'JOINED_SUCCESS',
+          candidates: hostCards.map(c => c.name)
+        });
+
+        if (!document.getElementById('view-host-game').classList.contains('hidden')) {
+          sendGameStateToPlayer(conn);
+        }
+      } else if (data.type === 'PLAYER_VOTE') {
+        const player = hostPlayers.find(p => p.id === conn.peer || p.name === data.playerName);
+        if (player) {
+          player.votedChoice = data.choice;
+          updateHostVoteCounter();
+        }
+      }
+    }
+
+    function parseBatchPastedCards() {
+      playSound('click');
+      const raw = document.getElementById('host-batch-paste-input').value;
+      const lines = raw.split('\n');
+      let count = 0;
+
+      lines.forEach(line => {
+        if (line.includes('KARTA#')) {
+          const parts = line.split('#');
+          if (parts.length >= 3) {
+            const name = parts[1].trim();
+            const facts = parts[2].split('|').map(f => f.trim());
+            if (name && facts.length >= 3) {
+              hostCards = hostCards.filter(c => c.name !== name);
+              hostCards.push({ name, facts });
+              count++;
+            }
+          }
+        }
+      });
+
       renderHostCardsList();
+      alert(`Wczytano ${count} kart z wklejonego tekstu!`);
     }
 
     function renderHostCardsList() {
@@ -614,6 +651,8 @@
         `;
         container.appendChild(item);
       });
+
+      document.getElementById('btn-start-show').disabled = hostCards.length === 0;
     }
 
     function removeHostCard(index) {
@@ -639,78 +678,8 @@
       renderHostCardsList();
     }
 
-    function initHostRoom() {
-      if (hostCards.length === 0) {
-        alert('Dodaj lub pobierz z chmury przynajmniej jedną kartę!');
-        return;
-      }
-      playSound('click');
-
-      const numCode = Math.floor(1000 + Math.random() * 9000);
-      roomCode = numCode.toString();
-      const peerId = 'ktotojest-room-' + roomCode;
-
-      peer = new Peer(peerId);
-
-      peer.on('open', (id) => {
-        document.getElementById('host-room-code-display').innerText = roomCode;
-        const pageUrl = window.location.href.split('?')[0];
-        const qrImg = document.getElementById('qr-code-img');
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pageUrl)}`;
-        qrImg.classList.remove('hidden');
-        showView('view-host-lobby');
-      });
-
-      peer.on('connection', (conn) => {
-        conn.on('open', () => { hostConnections[conn.peer] = conn; });
-        conn.on('data', (data) => { handleHostReceivedData(conn, data); });
-        conn.on('close', () => { delete hostConnections[conn.peer]; });
-      });
-
-      peer.on('error', (err) => {
-        if (err.type === 'unavailable-id') initHostRoom();
-        else alert('Błąd PeerJS: ' + err.message);
-      });
-    }
-
-    function handleHostReceivedData(conn, data) {
-      if (data.type === 'JOIN_GAME') {
-        const playerName = data.playerName;
-        let existing = hostPlayers.find(p => p.name === playerName);
-        if (!existing) {
-          existing = { id: conn.peer, name: playerName, score: 0, votedChoice: null };
-          hostPlayers.push(existing);
-        } else {
-          existing.id = conn.peer;
-        }
-
-        document.getElementById('host-connected-count').innerText = hostPlayers.length;
-        document.getElementById('host-connected-players-list').innerHTML = 
-          hostPlayers.map(p => `<span class="bg-emerald-950 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded-lg">${p.name}</span>`).join('');
-
-        conn.send({
-          type: 'JOINED_SUCCESS',
-          candidates: hostCards.map(c => c.name)
-        });
-
-        if (!document.getElementById('view-host-game').classList.contains('hidden')) {
-          sendGameStateToPlayer(conn);
-        }
-      } else if (data.type === 'PLAYER_VOTE') {
-        const player = hostPlayers.find(p => p.id === conn.peer || p.name === data.playerName);
-        if (player) {
-          player.votedChoice = data.choice;
-          updateHostVoteCounter();
-        }
-      }
-    }
-
-    function updateHostVoteCounter() {
-      const votedCount = hostPlayers.filter(p => p.votedChoice !== null).length;
-      document.getElementById('host-votes-count').innerText = `${votedCount} / ${hostPlayers.length}`;
-    }
-
     function startHostGame() {
+      if (hostCards.length === 0) return;
       playSound('click');
       currentRoundIndex = 0;
       showView('view-host-game');
@@ -738,6 +707,11 @@
 
       document.getElementById('host-reveal-modal').classList.add('hidden');
       broadcastGameState();
+    }
+
+    function updateHostVoteCounter() {
+      const votedCount = hostPlayers.filter(p => p.votedChoice !== null).length;
+      document.getElementById('host-votes-count').innerText = `${votedCount} / ${hostPlayers.length}`;
     }
 
     function revealFact(factNum) {
