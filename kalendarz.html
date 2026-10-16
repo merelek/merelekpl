@@ -7,11 +7,11 @@
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS dla bezpośrednich połączeń P2P bez własnego serwera -->
+  <!-- PeerJS dla połączeń na żywo P2P -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- FontAwesome -->
+  <!-- FontAwesome Ikony -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -38,21 +38,20 @@
       border: 1px solid rgba(255, 255, 255, 0.15);
     }
     .glow-green {
-      box-shadow: 0 0 25px rgba(34, 197, 94, 0.4);
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
     }
     .glow-red {
-      box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.3);
     }
   </style>
 </head>
 <body class="bg-slate-950 text-white min-h-screen font-sans selection:bg-indigo-500 selection:text-white">
 
-  <!-- APLIKACJA -->
   <div id="app" class="max-w-4xl mx-auto p-4 md:p-6 min-h-screen flex flex-col justify-between">
 
     <!-- NAGŁÓWEK -->
     <header class="text-center py-4 border-b border-slate-800 mb-6">
-      <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 tracking-tight">
+      <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 tracking-tight cursor-pointer" onclick="showView('view-mode-select')">
         🕵️ Kto To Jest?
       </h1>
       <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej z tajemnicami</p>
@@ -61,81 +60,134 @@
     <!-- WIDOK 1: WYBÓR TRYBU -->
     <main id="view-mode-select" class="space-y-6 my-auto">
       <div class="text-center space-y-2">
-        <h2 class="text-2xl font-bold">Wybierz swoją rolę w grze:</h2>
-        <p class="text-slate-400 text-sm">Jedna osoba otwiera stronę na komputerze (Prowadzący), a pozostali na telefonach.</p>
+        <h2 class="text-2xl font-bold">Wybierz opcję:</h2>
+        <p class="text-slate-400 text-sm">Najpierw wszyscy tworzą swoje karty, a potem Prowadzący pobiera je jednym kliknięciem!</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-        <!-- Przycisk Komputer -->
-        <button onclick="selectRole('host')" class="group relative p-8 rounded-3xl bg-gradient-to-br from-indigo-900/60 to-purple-900/60 border border-indigo-500/30 hover:border-indigo-400 transition-all duration-300 text-left hover:scale-[1.02] shadow-xl">
-          <div class="text-4xl mb-3">💻</div>
-          <h3 class="text-2xl font-bold text-white group-hover:text-indigo-300">1. Komputer Główny</h3>
-          <p class="text-indigo-200/70 text-sm mt-2">Dla Prowadzącego. Tworzy pokój, wpisuje uczestników z ich faktami i wyświetla teleturniej na dużym ekranie.</p>
-          <span class="inline-block mt-4 text-xs font-semibold px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30">Tworzenie pokoju &rarr;</span>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+        <!-- Opcja 1: Tworzenie Karty -->
+        <button onclick="selectRole('creator')" class="group p-6 rounded-3xl bg-gradient-to-br from-amber-900/50 to-orange-900/50 border border-amber-500/30 hover:border-amber-400 transition text-left hover:scale-[1.02] shadow-xl">
+          <div class="text-3xl mb-2">📝</div>
+          <h3 class="text-xl font-bold text-white group-hover:text-amber-300">1. Stwórz swoją kartę</h3>
+          <p class="text-amber-200/70 text-xs mt-2">Dla każdego uczestnika. Wpisz swoje imię, 3 tajemnicze fakty i wyślij do chmury.</p>
         </button>
 
-        <!-- Przycisk Telefon -->
-        <button onclick="selectRole('player')" class="group relative p-8 rounded-3xl bg-gradient-to-br from-emerald-900/60 to-teal-900/60 border border-emerald-500/30 hover:border-emerald-400 transition-all duration-300 text-left hover:scale-[1.02] shadow-xl">
-          <div class="text-4xl mb-3">📱</div>
-          <h3 class="text-2xl font-bold text-white group-hover:text-emerald-300">2. Telefon (Uczestnik)</h3>
-          <p class="text-emerald-200/70 text-sm mt-2">Dla graczy. Dołączasz podając 4-cyfrowy kod pokoju, oglądasz fakty na żywo i zgadujesz na swoim ekranie.</p>
-          <span class="inline-block mt-4 text-xs font-semibold px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30">Dołącz do gry &rarr;</span>
+        <!-- Opcja 2: Komputer Główny -->
+        <button onclick="selectRole('host')" class="group p-6 rounded-3xl bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 hover:border-indigo-400 transition text-left hover:scale-[1.02] shadow-xl">
+          <div class="text-3xl mb-2">💻</div>
+          <h3 class="text-xl font-bold text-white group-hover:text-indigo-300">2. Komputer Główny</h3>
+          <p class="text-indigo-200/70 text-xs mt-2">Dla Prowadzącego. Pobierz karty z chmury jednym przyciskiem i prowadź grę.</p>
+        </button>
+
+        <!-- Opcja 3: Telefon Dołącz -->
+        <button onclick="selectRole('player')" class="group p-6 rounded-3xl bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border border-emerald-500/30 hover:border-emerald-400 transition text-left hover:scale-[1.02] shadow-xl">
+          <div class="text-3xl mb-2">📱</div>
+          <h3 class="text-xl font-bold text-white group-hover:text-emerald-300">3. Telefon (Gracz)</h3>
+          <p class="text-emerald-200/70 text-xs mt-2">Dla graczy w trakcie teleturnieju. Dołącz za pomocą 4-cyfrowego kodu pokoju.</p>
         </button>
       </div>
     </main>
 
 
     <!-- ============================================================================================== -->
+    <!-- WIDOK CREATORA: TWORZENIE SWOJEJ KARTY I WYSYŁKA DO CHMURY -->
+    <!-- ============================================================================================== -->
+    <section id="view-card-creator" class="hidden space-y-5 my-auto max-w-lg mx-auto w-full">
+      <div class="glass-card p-6 rounded-3xl space-y-4 border border-amber-500/30">
+        <div class="text-center">
+          <h2 class="text-2xl font-bold text-amber-400">📝 Stwórz swoją Kartę Tajemnic</h2>
+          <p class="text-slate-400 text-xs mt-1">Wpisz prawdę o sobie, której inni mogą nie wiedzieć!</p>
+        </div>
+
+        <form onsubmit="submitCardToCloud(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Kod Wydarzenia / Imprezy (wymyślony przez Prowadzącego)</label>
+            <input id="create-event-code" type="text" placeholder="np. IMPREZA2026" required class="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-4 py-2.5 text-amber-300 font-bold tracking-wider focus:outline-none uppercase text-center">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Twoje Imię / Nick</label>
+            <input id="create-name" type="text" placeholder="np. Kasia" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #1</label>
+            <input id="create-fact1" type="text" placeholder="np. Spałam kiedyś na lotnisku" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #2</label>
+            <input id="create-fact2" type="text" placeholder="np. Umiem lutować elektronikę" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #3</label>
+            <input id="create-fact3" type="text" placeholder="np. Chcę odwiedzić Japonię" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+          </div>
+
+          <button id="btn-submit-cloud" type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-lg rounded-2xl shadow-xl transition transform active:scale-95">
+            ☁️ Wyślij moją kartę do chmury
+          </button>
+        </form>
+
+        <div id="creator-success-msg" class="hidden p-4 bg-emerald-950/80 border border-emerald-500/50 rounded-2xl text-center space-y-1">
+          <p class="text-emerald-300 font-bold">✅ Karta wysłana pomyślnie!</p>
+          <p class="text-xs text-slate-300">Prowadzący pobierze ją na komputer przyciskiem pobierania.</p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================================================== -->
     <!-- WIDOKI PROWADZĄCEGO (HOST / KOMPUTER) -->
     <!-- ============================================================================================== -->
-
-    <!-- HOST STEP 1: DODAWANIE KART UCZESTNIKÓW -->
     <section id="view-host-setup" class="hidden space-y-6">
       <div class="flex items-center justify-between border-b border-slate-800 pb-4">
         <div>
-          <h2 class="text-2xl font-bold text-indigo-400">Panel Prowadzącego: Dodawanie Uczestników</h2>
-          <p class="text-slate-400 text-xs">Wpisz dane 20 osób (lub wgraj przykładowe dane do testu).</p>
+          <h2 class="text-2xl font-bold text-indigo-400">Panel Prowadzącego: Przygotowanie Gry</h2>
+          <p class="text-slate-400 text-xs">Pobierz karty przesłane przez graczy z chmury lub dodaj ręcznie.</p>
         </div>
         <button onclick="loadSampleData()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg border border-slate-700 transition">
-          ⚡ Załaduj przykładowe karty
+          ⚡ Przykładowe karty
         </button>
       </div>
 
-      <!-- Formularz dodawania -->
-      <form onsubmit="addHostCard(event)" class="glass-card p-5 rounded-2xl space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Imię / Nick Uczestnika</label>
-          <input id="input-host-name" type="text" placeholder="np. Kasia" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-indigo-500">
+      <!-- SEKCJA AUTOMATYCZNEGO POBIERANIA Z CHMURY -->
+      <div class="glass-card p-5 rounded-2xl space-y-3 border border-indigo-500/30 bg-indigo-950/20">
+        <h3 class="font-bold text-indigo-300 text-sm flex items-center gap-2">
+          <span>☁️ Automatyczne Pobieranie Kart z Chmury</span>
+        </h3>
+        <div class="flex gap-3">
+          <input id="host-fetch-code" type="text" placeholder="Kod Wydarzenia (np. IMPREZA2026)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-bold uppercase focus:outline-none focus:border-indigo-500">
+          <button onclick="fetchCardsFromCloud()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition flex items-center gap-2">
+            <span>📥 Pobierz karty z chmury</span>
+          </button>
         </div>
+        <p class="text-[11px] text-slate-400">Wystarczy kliknąć przycisk, a wszystkie karty utworzone przez uczestników pod tym kodem wczytają się same!</p>
+      </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #1</label>
-            <input id="input-host-fact1" type="text" placeholder="np. Spałam na lotnisku" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+      <!-- Formularz Ręczny -->
+      <details class="glass-card p-4 rounded-2xl text-xs text-slate-300">
+        <summary class="font-bold cursor-pointer text-slate-300 hover:text-white">➕ Lub dodaj kartę ręcznie na tym komputerze</summary>
+        <form onsubmit="addHostCard(event)" class="space-y-3 mt-3 pt-3 border-t border-slate-800">
+          <input id="input-host-name" type="text" placeholder="Imię" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <input id="input-host-fact1" type="text" placeholder="Fakt 1" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
+            <input id="input-host-fact2" type="text" placeholder="Fakt 2" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
+            <input id="input-host-fact3" type="text" placeholder="Fakt 3" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white">
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #2</label>
-            <input id="input-host-fact2" type="text" placeholder="np. Umiem lutować" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Fakt #3</label>
-            <input id="input-host-fact3" type="text" placeholder="np. Chcę odwiedzić Japonię" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
-          </div>
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg transition">
-          ➕ Dodaj Kartę Uczestnika
-        </button>
-      </form>
+          <button type="submit" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700">Dodaj kartę</button>
+        </form>
+      </details>
 
       <!-- Lista dodanych kart -->
       <div class="space-y-3">
         <div class="flex justify-between items-center">
-          <h3 class="font-bold text-slate-300">Dodani Uczestnicy (<span id="host-card-count">0</span>):</h3>
+          <h3 class="font-bold text-slate-300">Pobrane/Dodane Karty (<span id="host-card-count">0</span>):</h3>
           <button onclick="clearAllCards()" class="text-xs text-rose-400 hover:underline">Wyczyść listę</button>
         </div>
         <div id="host-card-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
-          <!-- Dodane karty wskakują dynamicznie -->
+          <!-- Karty z chmury wczytują się tutaj -->
         </div>
       </div>
 
@@ -150,7 +202,7 @@
     <!-- HOST STEP 2: POCZEKALNIA Z KODEM POKOJU -->
     <section id="view-host-lobby" class="hidden text-center space-y-6 my-auto">
       <div class="glass-card p-8 rounded-3xl space-y-6 max-w-lg mx-auto">
-        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Pokój Gotowy</span>
+        <span class="text-xs uppercase font-bold tracking-widest text-emerald-400">Pokój Pokazu Gotowy</span>
         <h2 class="text-xl text-slate-300">Kod Pokoju dla Telefonów:</h2>
         
         <div id="host-room-code-display" class="text-6xl font-black text-amber-400 tracking-wider bg-slate-900/80 py-4 rounded-2xl border border-amber-500/30">
@@ -158,7 +210,6 @@
         </div>
 
         <div id="qr-container" class="flex flex-col items-center justify-center pt-2">
-          <!-- Dynamiczny QR code -->
           <img id="qr-code-img" src="" alt="Kod QR" class="w-44 h-44 rounded-xl border-2 border-slate-700 shadow-lg hidden">
         </div>
 
@@ -195,19 +246,16 @@
         </div>
 
         <div class="space-y-4">
-          <!-- FAKT 1 -->
           <div id="fact-box-1" class="p-4 rounded-xl bg-slate-900 border border-slate-800 transition-all">
             <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider block mb-1">Fakt #1</span>
             <p id="fact-text-1" class="text-lg md:text-xl font-medium text-white">...</p>
           </div>
 
-          <!-- FAKT 2 -->
           <div id="fact-box-2" class="p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all">
             <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider block mb-1">Fakt #2</span>
             <p id="fact-text-2" class="text-lg md:text-xl font-medium text-slate-400">🔒 [Zablokowany]</p>
           </div>
 
-          <!-- FAKT 3 -->
           <div id="fact-box-3" class="p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all">
             <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider block mb-1">Fakt #3</span>
             <p id="fact-text-3" class="text-lg md:text-xl font-medium text-slate-400">🔒 [Zablokowany]</p>
@@ -230,8 +278,8 @@
         </button>
       </div>
 
-      <!-- WIDOK POPRAWNEJ ODPOWIEDZI (PO ODKRYCIU) -->
-      <div id="host-reveal-modal" class="hidden glass-card p-6 md:p-8 rounded-3xl bg-slate-900/90 border-2 border-amber-400/50 space-y-6">
+      <!-- WIDOK POPRAWNEJ ODPOWIEDZI -->
+      <div id="host-reveal-modal" class="hidden glass-card p-6 md:p-8 rounded-3xl bg-slate-900/95 border-2 border-amber-400/50 space-y-6">
         <div class="text-center space-y-2">
           <span class="text-xs uppercase font-bold tracking-widest text-amber-400">Tajemniczą Osobą Był(a):</span>
           <h2 id="host-revealed-name" class="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-100 to-amber-400">
@@ -239,17 +287,15 @@
           </h2>
         </div>
 
-        <!-- Lista osób, które trafiły -->
         <div class="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-3">
-          <h3 class="font-bold text-emerald-400 text-sm uppercase tracking-wider flex items-center gap-2">
-            <span>🎯 Osoby, które odpowiedziały poprawnie (+1 PKT):</span>
+          <h3 class="font-bold text-emerald-400 text-sm uppercase tracking-wider">
+            🎯 Osoby, które odpowiedziały poprawnie (+1 PKT):
           </h3>
           <div id="host-correct-players-list" class="flex flex-wrap gap-2">
             <!-- Imiona wygranych -->
           </div>
         </div>
 
-        <!-- Tabela wyników -->
         <div class="space-y-2">
           <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Aktualny Ranking Punktowy:</h3>
           <div id="host-leaderboard" class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
@@ -267,12 +313,10 @@
     <!-- ============================================================================================== -->
     <!-- WIDOKI GRACZA (TELEFON) -->
     <!-- ============================================================================================== -->
-
-    <!-- PLAYER STEP 1: DOŁĄCZANIE DO POKOJU -->
     <section id="view-player-join" class="hidden space-y-6 my-auto">
       <div class="glass-card p-6 rounded-3xl space-y-5 max-w-md mx-auto">
         <div class="text-center">
-          <h2 class="text-2xl font-bold text-emerald-400">Dołącz do Gry</h2>
+          <h2 class="text-2xl font-bold text-emerald-400">Dołącz do Teleturnieju</h2>
           <p class="text-slate-400 text-xs mt-1">Wpisz kod podany na ekranie komputera</p>
         </div>
 
@@ -294,9 +338,8 @@
       </div>
     </section>
 
-    <!-- PLAYER STEP 2: EKRAN GRY / PODPOWIEDZI / GŁOSOWANIE -->
+    <!-- PLAYER STEP 2: EKRAN GRY Z GŁOSOWANIEM -->
     <section id="view-player-game" class="hidden space-y-5">
-      <!-- Status i punkty -->
       <div class="flex justify-between items-center bg-slate-900 p-3.5 rounded-2xl border border-slate-800">
         <div class="text-xs">
           <span class="text-slate-400">Gracz:</span>
@@ -307,7 +350,6 @@
         </div>
       </div>
 
-      <!-- KARTA PODPOWIEDZI DLA TELEFONU -->
       <div class="glass-card p-5 rounded-3xl space-y-4 border border-indigo-500/20">
         <div class="text-center border-b border-slate-800 pb-2">
           <span id="player-round-badge" class="text-xs text-indigo-400 font-bold uppercase tracking-wider">Runda 1</span>
@@ -332,7 +374,6 @@
         </div>
       </div>
 
-      <!-- SEKCJA ZGADYWANIA -->
       <div id="player-voting-section" class="space-y-3">
         <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider text-center">Kto to Twoim zdaniem jest? Zaznacz:</h4>
         <div id="player-candidates-grid" class="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
@@ -340,16 +381,14 @@
         </div>
       </div>
 
-      <!-- STATUS ODDANEGO GŁOSU -->
       <div id="player-voted-status" class="hidden glass-card p-4 rounded-2xl text-center bg-indigo-950/40 border border-indigo-500/30">
         <p class="text-xs text-indigo-300">Twój typ został wysłany:</p>
         <p id="player-voted-choice" class="text-xl font-extrabold text-amber-300 my-1">---</p>
         <p class="text-[11px] text-slate-400">Czekaj na odkrycie prawdy na dużym ekranie!</p>
       </div>
 
-      <!-- EKRAN WYNIKU RUNDY NA TELEFONIE (SUKCES / PORAŻKA) -->
+      <!-- EKRAN WYNIKU RUNDY NA TELEFONIE -->
       <div id="player-round-result" class="hidden space-y-4">
-        <!-- Wariant SUKCES -->
         <div id="player-result-success" class="hidden glass-card p-6 rounded-3xl text-center bg-emerald-950/80 border-2 border-emerald-400 glow-green animate-success space-y-3">
           <div class="text-5xl">🎉</div>
           <h3 class="text-2xl font-black text-emerald-300">GIGA SUKCES!</h3>
@@ -360,7 +399,6 @@
           <p class="text-xs text-emerald-300/80 pt-1">Twój aktualny wynik: <span class="player-total-score-span font-bold">0</span> pkt</p>
         </div>
 
-        <!-- Wariant PORAŻKA -->
         <div id="player-result-fail" class="hidden glass-card p-6 rounded-3xl text-center bg-rose-950/80 border-2 border-rose-500 glow-red animate-fail space-y-3">
           <div class="text-5xl">❌</div>
           <h3 class="text-2xl font-black text-rose-300">PUDŁO!</h3>
@@ -377,31 +415,28 @@
 
     <!-- STOPKA -->
     <footer class="text-center py-4 text-xs text-slate-600 border-t border-slate-900 mt-6">
-      Kto to jest? — Karta Tajemnic &bull; Gra Towarzyska P2P
+      Kto to jest? — Karta Tajemnic &bull; Gra Towarzyska Chmura & P2P
     </footer>
   </div>
 
-  <!-- SKRYPT LOGIKI APKLIKACJI -->
   <script>
     // --- STAN GRY ---
-    let myRole = null; // 'host' lub 'player'
+    let myRole = null;
     let peer = null;
     let roomCode = '';
     
-    // Stan dla Prowadzącego
     let hostCards = [];
-    let hostConnections = {}; // peerId -> conn
-    let hostPlayers = [];     // [{ id, name, score, votedChoice }]
+    let hostConnections = {};
+    let hostPlayers = [];
     let currentRoundIndex = 0;
     let currentRoundFactsRevealed = 1;
 
-    // Stan dla Gracza
     let playerMyName = '';
     let playerMyScore = 0;
     let playerVotedChoice = null;
     let hostConn = null;
 
-    // AUDIO SYNTHESIZER
+    // SYNTEZATOR DŹWIĘKÓW (Web Audio API)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
       try {
@@ -424,10 +459,10 @@
           osc.start(); osc.stop(audioCtx.currentTime + 0.15);
         } else if (type === 'win') {
           const now = audioCtx.currentTime;
-          osc.frequency.setValueAtTime(523.25, now); // C5
-          osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-          osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-          osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.1);
+          osc.frequency.setValueAtTime(783.99, now + 0.2);
+          osc.frequency.setValueAtTime(1046.50, now + 0.3);
           gain.gain.setValueAtTime(0.15, now);
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
           osc.start(now); osc.stop(now + 0.6);
@@ -442,11 +477,10 @@
       } catch(e) {}
     }
 
-    // --- NAWIGACJA WIDOKÓW ---
     function showView(viewId) {
       const views = [
-        'view-mode-select', 'view-host-setup', 'view-host-lobby', 
-        'view-host-game', 'view-player-join', 'view-player-game'
+        'view-mode-select', 'view-card-creator', 'view-host-setup', 
+        'view-host-lobby', 'view-host-game', 'view-player-join', 'view-player-game'
       ];
       views.forEach(id => {
         const el = document.getElementById(id);
@@ -458,14 +492,91 @@
     function selectRole(role) {
       playSound('click');
       myRole = role;
-      if (role === 'host') {
-        showView('view-host-setup');
-      } else {
-        showView('view-player-join');
+      if (role === 'creator') showView('view-card-creator');
+      else if (role === 'host') showView('view-host-setup');
+      else showView('view-player-join');
+    }
+
+    // --- LOGIKA TWORZENIA KARTY I OBSŁUGA CHMURY ---
+    async function submitCardToCloud(e) {
+      e.preventDefault();
+      playSound('click');
+
+      const btn = document.getElementById('btn-submit-cloud');
+      btn.disabled = true;
+      btn.innerText = '⏳ Wysyłanie do chmury...';
+
+      const eventCode = document.getElementById('create-event-code').value.trim().toUpperCase();
+      const name = document.getElementById('create-name').value.trim();
+      const f1 = document.getElementById('create-fact1').value.trim();
+      const f2 = document.getElementById('create-fact2').value.trim();
+      const f3 = document.getElementById('create-fact3').value.trim();
+
+      const cardData = { name, facts: [f1, f2, f3] };
+
+      try {
+        const url = `https://jsonstorage.net/api/items/${encodeURIComponent(eventCode)}`;
+        let currentCards = [];
+        
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const fetched = await res.json();
+            if (Array.isArray(fetched)) currentCards = fetched;
+          }
+        } catch(err) {}
+
+        currentCards = currentCards.filter(c => c.name !== name);
+        currentCards.push(cardData);
+
+        await fetch(url, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(currentCards)
+        });
+
+        document.getElementById('creator-success-msg').classList.remove('hidden');
+        btn.innerText = '✅ Wysłano do chmury!';
+        playSound('win');
+      } catch(err) {
+        alert('Błąd wysyłania do chmury: ' + err.message);
+        btn.disabled = false;
+        btn.innerText = '☁️ Wyślij moją kartę do chmury';
       }
     }
 
-    // --- LOGIKA PROWADZĄCEGO (HOST) ---
+    async function fetchCardsFromCloud() {
+      playSound('click');
+      const eventCode = document.getElementById('host-fetch-code').value.trim().toUpperCase();
+      if (!eventCode) {
+        alert('Wpisz Kod Wydarzenia!');
+        return;
+      }
+
+      try {
+        const url = `https://jsonstorage.net/api/items/${encodeURIComponent(eventCode)}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Nie znaleziono kart pod tym kodem!');
+
+        const cards = await res.json();
+        if (Array.isArray(cards) && cards.length > 0) {
+          cards.forEach(card => {
+            if (!hostCards.some(c => c.name === card.name)) {
+              hostCards.push(card);
+            }
+          });
+          renderHostCardsList();
+          playSound('win');
+          alert(`Pomyślnie pobrano ${cards.length} kart z chmury!`);
+        } else {
+          alert('Brak kart pod podanym kodem.');
+        }
+      } catch(err) {
+        alert('Błąd pobierania z chmury: ' + err.message);
+      }
+    }
+
+    // --- LOGIKA HOST ---
     function addHostCard(e) {
       e.preventDefault();
       playSound('click');
@@ -477,12 +588,10 @@
       if (!name || !f1 || !f2 || !f3) return;
 
       hostCards.push({ name, facts: [f1, f2, f3] });
-      
       document.getElementById('input-host-name').value = '';
       document.getElementById('input-host-fact1').value = '';
       document.getElementById('input-host-fact2').value = '';
       document.getElementById('input-host-fact3').value = '';
-
       renderHostCardsList();
     }
 
@@ -532,12 +641,11 @@
 
     function initHostRoom() {
       if (hostCards.length === 0) {
-        alert('Dodaj przynajmniej jedną kartę uczestnika!');
+        alert('Dodaj lub pobierz z chmury przynajmniej jedną kartę!');
         return;
       }
       playSound('click');
 
-      // Generuj 4-cyfrowy kod pokoju
       const numCode = Math.floor(1000 + Math.random() * 9000);
       roomCode = numCode.toString();
       const peerId = 'ktotojest-room-' + roomCode;
@@ -546,45 +654,28 @@
 
       peer.on('open', (id) => {
         document.getElementById('host-room-code-display').innerText = roomCode;
-        
-        // QR Code
         const pageUrl = window.location.href.split('?')[0];
         const qrImg = document.getElementById('qr-code-img');
         qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pageUrl)}`;
         qrImg.classList.remove('hidden');
-
         showView('view-host-lobby');
       });
 
       peer.on('connection', (conn) => {
-        conn.on('open', () => {
-          hostConnections[conn.peer] = conn;
-        });
-
-        conn.on('data', (data) => {
-          handleHostReceivedData(conn, data);
-        });
-
-        conn.on('close', () => {
-          delete hostConnections[conn.peer];
-        });
+        conn.on('open', () => { hostConnections[conn.peer] = conn; });
+        conn.on('data', (data) => { handleHostReceivedData(conn, data); });
+        conn.on('close', () => { delete hostConnections[conn.peer]; });
       });
 
       peer.on('error', (err) => {
-        if (err.type === 'unavailable-id') {
-          // Kod zajęty, spróbuj ponownie
-          initHostRoom();
-        } else {
-          alert('Błąd PeerJS: ' + err.message);
-        }
+        if (err.type === 'unavailable-id') initHostRoom();
+        else alert('Błąd PeerJS: ' + err.message);
       });
     }
 
     function handleHostReceivedData(conn, data) {
       if (data.type === 'JOIN_GAME') {
         const playerName = data.playerName;
-        
-        // Sprawdź czy gracz już istnieje
         let existing = hostPlayers.find(p => p.name === playerName);
         if (!existing) {
           existing = { id: conn.peer, name: playerName, score: 0, votedChoice: null };
@@ -593,18 +684,15 @@
           existing.id = conn.peer;
         }
 
-        // Aktualizuj widok w poczekalni
         document.getElementById('host-connected-count').innerText = hostPlayers.length;
-        const listEl = document.getElementById('host-connected-players-list');
-        listEl.innerHTML = hostPlayers.map(p => `<span class="bg-emerald-950 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded-lg">${p.name}</span>`).join('');
+        document.getElementById('host-connected-players-list').innerHTML = 
+          hostPlayers.map(p => `<span class="bg-emerald-950 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded-lg">${p.name}</span>`).join('');
 
-        // Wyślij potwierdzenie graczowi
         conn.send({
           type: 'JOINED_SUCCESS',
           candidates: hostCards.map(c => c.name)
         });
 
-        // Jeśli gra trwa, wyślij aktualny stan
         if (!document.getElementById('view-host-game').classList.contains('hidden')) {
           sendGameStateToPlayer(conn);
         }
@@ -631,40 +719,30 @@
 
     function setupHostRound() {
       currentRoundFactsRevealed = 1;
-      
-      // Zresetuj typy graczy
       hostPlayers.forEach(p => p.votedChoice = null);
       updateHostVoteCounter();
 
       const currentCard = hostCards[currentRoundIndex];
-
       document.getElementById('host-round-badge').innerText = `Runda ${currentRoundIndex + 1} / ${hostCards.length}`;
       document.getElementById('host-mystery-title').innerText = `❓ Tajemnicza Osoba #${currentRoundIndex + 1}`;
 
-      // Ustaw fakty
       document.getElementById('fact-text-1').innerText = currentCard.facts[0];
       document.getElementById('fact-text-2').innerText = '🔒 [Zablokowany]';
       document.getElementById('fact-text-3').innerText = '🔒 [Zablokowany]';
 
-      // Style faktów
       document.getElementById('fact-box-2').className = 'p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all';
       document.getElementById('fact-box-3').className = 'p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 opacity-40 transition-all';
 
-      // Przyciski
       document.getElementById('btn-reveal-fact-2').disabled = false;
       document.getElementById('btn-reveal-fact-3').disabled = true;
 
-      // Ukryj modal ze starym wynikiem
       document.getElementById('host-reveal-modal').classList.add('hidden');
-
-      // Wyślij stan do wszystkich telefonów
       broadcastGameState();
     }
 
     function revealFact(factNum) {
       playSound('reveal');
       currentRoundFactsRevealed = factNum;
-
       const currentCard = hostCards[currentRoundIndex];
 
       if (factNum === 2) {
@@ -688,20 +766,17 @@
       const currentCard = hostCards[currentRoundIndex];
       const correctAnswer = currentCard.name;
 
-      // Przydziel punkty i oblicz kto trafił
       const correctPlayers = [];
       hostPlayers.forEach(p => {
-        const isCorrect = p.votedChoice === correctAnswer;
-        if (isCorrect) {
-          p.score += 1; // +1 PKT za poprawną odpowiedź
+        if (p.votedChoice === correctAnswer) {
+          p.score += 1;
           correctPlayers.push(p.name);
         }
       });
 
-      // Pokaż wynik w panelu Host
       document.getElementById('host-revealed-name').innerText = correctAnswer;
-      
       const winnersContainer = document.getElementById('host-correct-players-list');
+      
       if (correctPlayers.length > 0) {
         winnersContainer.innerHTML = correctPlayers.map(name => `
           <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-3 py-1.5 rounded-xl text-sm animate-pulse">
@@ -712,22 +787,16 @@
         winnersContainer.innerHTML = `<span class="text-slate-500 text-xs italic">Nikt nie odgadł tym razem...</span>`;
       }
 
-      // Renderuj Leaderboard
       renderLeaderboard();
-
-      // Pokaż modal rozwiązania
       document.getElementById('host-reveal-modal').classList.remove('hidden');
 
-      // Wyślij sygnał końca rundy i wyniki do telefonów
       Object.keys(hostConnections).forEach(peerId => {
         const conn = hostConnections[peerId];
         const player = hostPlayers.find(p => p.id === peerId);
-        
         if (player) {
-          const isCorrect = player.votedChoice === correctAnswer;
           conn.send({
             type: 'ROUND_RESULT',
-            isCorrect: isCorrect,
+            isCorrect: player.votedChoice === correctAnswer,
             correctAnswer: correctAnswer,
             yourChoice: player.votedChoice,
             myScore: player.score
@@ -737,10 +806,8 @@
     }
 
     function renderLeaderboard() {
-      // Sortuj graczy malejąco po punktach
       const sorted = [...hostPlayers].sort((a, b) => b.score - a.score);
-      const container = document.getElementById('host-leaderboard');
-      container.innerHTML = sorted.map((p, idx) => `
+      document.getElementById('host-leaderboard').innerHTML = sorted.map((p, idx) => `
         <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex justify-between items-center text-xs">
           <span class="font-bold text-slate-300">${idx + 1}. ${p.name}</span>
           <span class="font-black text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">${p.score} pkt</span>
@@ -772,9 +839,7 @@
         candidates: hostCards.map(c => c.name)
       };
 
-      Object.values(hostConnections).forEach(conn => {
-        conn.send(stateData);
-      });
+      Object.values(hostConnections).forEach(conn => conn.send(stateData));
     }
 
     function sendGameStateToPlayer(conn) {
@@ -792,8 +857,7 @@
       });
     }
 
-
-    // --- LOGIKA GRACZA (PLAYER / TELEFON) ---
+    // --- LOGIKA GRACZA (PLAYER) ---
     function joinPlayerRoom(e) {
       e.preventDefault();
       playSound('click');
@@ -804,7 +868,6 @@
       if (!codeInput || !playerMyName) return;
 
       const targetHostPeerId = 'ktotojest-room-' + codeInput;
-
       peer = new Peer();
 
       peer.on('open', () => {
@@ -814,20 +877,14 @@
           document.getElementById('player-profile-name').innerText = playerMyName;
           showView('view-player-game');
 
-          // Wyślij prośbę o dołączenie
           hostConn.send({
             type: 'JOIN_GAME',
             playerName: playerMyName
           });
         });
 
-        hostConn.on('data', (data) => {
-          handlePlayerReceivedData(data);
-        });
-
-        hostConn.on('error', (err) => {
-          alert('Nie udało się połączyć z pokojem: ' + err);
-        });
+        hostConn.on('data', (data) => { handlePlayerReceivedData(data); });
+        hostConn.on('error', (err) => { alert('Nie udało się połączyć z pokojem: ' + err); });
       });
     }
 
@@ -842,13 +899,10 @@
     }
 
     function updatePlayerGameUI(data) {
-      // Zresetuj widok wyniku rundy jeśli nowa runda
       document.getElementById('player-round-result').classList.add('hidden');
       document.getElementById('player-voting-section').classList.remove('hidden');
 
       document.getElementById('player-round-badge').innerText = `Runda ${data.roundNum}`;
-
-      // Podpowiedzi
       document.getElementById('player-fact-1').innerText = data.facts[0];
 
       if (data.factsRevealed >= 2 && data.facts[1]) {
@@ -893,7 +947,6 @@
       playSound('click');
       playerVotedChoice = candidateName;
 
-      // Odśwież przyciski
       const buttons = document.querySelectorAll('#player-candidates-grid button');
       buttons.forEach(btn => {
         if (btn.innerText === candidateName) {
@@ -903,11 +956,9 @@
         }
       });
 
-      // Pokaż powiadomienie
       document.getElementById('player-voted-status').classList.remove('hidden');
       document.getElementById('player-voted-choice').innerText = candidateName;
 
-      // Wyślij głos do Hosta
       if (hostConn) {
         hostConn.send({
           type: 'PLAYER_VOTE',
@@ -928,22 +979,17 @@
       resultContainer.classList.remove('hidden');
 
       if (data.isCorrect) {
-        // SUKCES!
         playSound('win');
         confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
 
         playerMyScore = data.myScore;
         document.getElementById('player-score-count').innerText = playerMyScore;
-        
-        const scoreSpans = document.querySelectorAll('.player-total-score-span');
-        scoreSpans.forEach(s => s.innerText = playerMyScore);
+        document.querySelectorAll('.player-total-score-span').forEach(s => s.innerText = playerMyScore);
 
         successBox.classList.remove('hidden');
         failBox.classList.add('hidden');
       } else {
-        // PORAŻKA!
         playSound('fail');
-
         document.getElementById('player-fail-your-choice').innerText = data.yourChoice || '(brak głosu)';
         document.getElementById('player-fail-correct-answer').innerText = data.correctAnswer;
 
@@ -951,7 +997,6 @@
         successBox.classList.add('hidden');
       }
 
-      // Zresetuj lokalny wybiór na następną rundę
       playerVotedChoice = null;
     }
   </script>
