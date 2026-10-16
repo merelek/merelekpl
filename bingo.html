@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo: Znajdź osobę, która...</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti for winning celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar and smooth transitions */
+        .tile-transition {
+            transition: all 0.25s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-slate-50 to-purple-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="w-full bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <div class="bg-indigo-600 text-white p-2.5 rounded-2xl shadow-md shadow-indigo-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-slate-900">Bingo Imprezowe</h1>
+                    <p class="text-xs text-slate-500 font-medium">Znajdź osoby, które pasują do opisów!</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2.5">
+                <button id="resetBtn" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition shadow-sm active:scale-95">
+                    Resetuj planszę
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl w-full mx-auto px-4 py-6 flex-grow flex flex-col items-center">
+        
+        <!-- Score & Status bar -->
+        <div class="w-full max-w-4xl bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg border border-indigo-100" id="checkedCount">0</div>
+                <div>
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Zaznaczone pola</span>
+                    <span class="text-sm font-medium text-slate-700">Cel: Utwórz linię Bingo!</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="bingoBadge" class="hidden px-3.5 py-1.5 bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md shadow-emerald-200 animate-bounce">
+                    🎉 BINGO! 🎉
+                </span>
+            </div>
+        </div>
+
+        <!-- Bingo Board Container (5x5 grid) -->
+        <div id="bingoBoard" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-3.5 w-full max-w-4xl">
+            <!-- Dynamic Tiles will be inserted here by JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-5 text-xs text-slate-400 border-t border-slate-200 mt-8 bg-white/50">
+        <p>Twoje postępy zapisują się automatycznie na tym urządzeniu (LocalStorage).</p>
+    </footer>
+
+    <!-- Custom Notification / Message Modal -->
+    <div id="messageModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-4 text-xl">
+                ✨
+            </div>
+            <h3 id="modalTitle" class="text-lg font-bold text-center text-slate-900 mb-2">Komunikat</h3>
+            <p id="modalText" class="text-sm text-slate-600 text-center mb-6 leading-relaxed">Treść komunikatu...</p>
+            <button id="modalCloseBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-indigo-200 transition active:scale-95">
+                Rozumiem
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // List of 25 items matching the user's requirements exactly in order
+        const BINGO_ITEMS = [
+            "Był(a) za granicą",
+            "Umie grać na instrumencie",
+            "Lubi góry bardziej niż morze",
+            "Ma nietypowe hobby",
+            "Był(a) na pielgrzymce",
+            "Zna 3 języki",
+            "Lubi wstawać wcześnie",
+            "Poznał(a) kogoś z grupy w tym roku",
+            "Chce odwiedzić konkretny kraj",
+            "Umie coś naprawić",
+            "Lubi śpiewać",
+            "Ma prawo jazdy", // Index 12 (Middle)
+            "Uprawia sport regularnie",
+            "Ma zwierzaka",
+            "Lubi gotować",
+            "Był(a) na nocnym czuwaniu",
+            "Woli spontaniczne wyjazdy",
+            "Potrafi zrobić coś własnoręcznie",
+            "Ma rodzeństwo",
+            "Zna ciekawostkę biblijną",
+            "Woli planszówki niż filmy",
+            "Chce nauczyć się nowej umiejętności",
+            "Był(a) w miejscu, w którym Ty nie byłeś(-aś)",
+            "Lubi podróże",
+            "Ma podobne zainteresowanie do Ciebie"
+        ];
+
+        // Storage keys
+        const STORAGE_KEY_STATE = 'bingo_user_state_v1';
+
+        // State initialization
+        let gameState = {
+            checked: Array(25).fill(false),
+            notes: Array(25).fill('')
+        };
+
+        // Free space (index 12) is always checked by default
+        gameState.checked[12] = true;
+
+        // Load state from localStorage if available
+        function loadState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY_STATE);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && Array.isArray(parsed.checked) && Array.isArray(parsed.notes)) {
+                        gameState.checked = parsed.checked;
+                        gameState.notes = parsed.notes;
+                        // Ensure free space is always checked
+                        gameState.checked[12] = true;
+                    }
+                }
+            } catch (e) {
+                console.error("Błąd ładowania danych z localStorage:", e);
+            }
+        }
+
+        // Save state to localStorage
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(gameState));
+            } catch (e) {
+                console.error("Błąd zapisu danych do localStorage:", e);
+            }
+        }
+
+        // UI Notification helper (instead of alert)
+        function showNotification(title, text) {
+            const modal = document.getElementById('messageModal');
+            const modalContent = document.getElementById('modalContent');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalText').innerText = text;
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }
+
+        function hideNotification() {
+            const modal = document.getElementById('messageModal');
+            const modalContent = document.getElementById('modalContent');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+        }
+
+        document.getElementById('modalCloseBtn').addEventListener('click', hideNotification);
+        document.getElementById('messageModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('messageModal')) {
+                hideNotification();
+            }
+        });
+
+        // Check if there is an active BINGO (rows, cols, diagonals)
+        function checkBingo() {
+            let hasBingo = false;
+            const c = gameState.checked;
+
+            // Winning combinations (5 rows, 5 cols, 2 diagonals)
+            const winCombos = [
+                // Rows
+                [0,1,2,3,4], [5,6,7,8,9], [10,11,12,13,14], [15,16,17,18,19], [20,21,22,23,24],
+                // Columns
+                [0,5,10,15,20], [1,6,11,16,21], [2,7,12,17,22], [3,8,13,18,23], [4,9,14,19,24],
+                // Diagonals
+                [0,6,12,18,24], [4,8,12,16,20]
+            ];
+
+            for (let combo of winCombos) {
+                if (combo.every(idx => c[idx])) {
+                    hasBingo = true;
+                    break;
+                }
+            }
+
+            const badge = document.getElementById('bingoBadge');
+            if (hasBingo) {
+                if (badge.classList.contains('hidden')) {
+                    badge.classList.remove('hidden');
+                    // Trigger celebratory confetti
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                    showNotification("Gratulacje!", "Udało Ci się ułożyć BINGO! Wspaniała robota!");
+                }
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Update checked counter display
+        function updateCounter() {
+            const count = gameState.checked.filter((val, idx) => val && idx !== 12).length;
+            document.getElementById('checkedCount').innerText = count;
+        }
+
+        // Render the board elements
+        function renderBoard() {
+            const boardContainer = document.getElementById('bingoBoard');
+            boardContainer.innerHTML = '';
+
+            BINGO_ITEMS.forEach((taskText, index) => {
+                const isChecked = gameState.checked[index];
+                const isFree = (index === 12);
+                const noteVal = gameState.notes[index] || '';
+
+                const tileDiv = document.createElement('div');
+                tileDiv.className = `tile-transition relative flex flex-col justify-between p-3.5 rounded-2xl border select-none min-h-[160px] shadow-sm ${
+                    isFree 
+                        ? 'bg-gradient-to-br from-amber-400 to-orange-500 border-amber-300 text-white font-bold cursor-default' 
+                        : isChecked 
+                            ? 'bg-indigo-50/90 border-indigo-300 text-indigo-900 shadow-md ring-2 ring-indigo-500/20' 
+                            : 'bg-white hover:bg-slate-50 border-slate-200/90 text-slate-700 cursor-pointer'
+                }`;
+
+                // Top task description part
+                const topPart = document.createElement('div');
+                topPart.className = "flex-grow flex items-center text-center justify-center cursor-pointer";
+                
+                const span = document.createElement('span');
+                span.className = `text-xs sm:text-sm font-semibold leading-snug px-1 pointer-events-none ${isFree ? 'text-white tracking-wider uppercase text-base' : ''}`;
+                span.innerText = taskText;
+                topPart.appendChild(span);
+
+                if (!isFree) {
+                    topPart.addEventListener('click', () => {
+                        gameState.checked[index] = !gameState.checked[index];
+                        saveState();
+                        renderBoard();
+                        updateCounter();
+                        checkBingo();
+                    });
+                }
+
+                tileDiv.appendChild(topPart);
+
+                // Bottom input note part (for writing person's name or note)
+                if (!isFree) {
+                    const bottomPart = document.createElement('div');
+                    bottomPart.className = "mt-3 pt-2 border-t border-slate-100/80";
+
+                    const input = document.createElement('input');
+                    input.type = "text";
+                    input.placeholder = "Wpisz imię / notatkę...";
+                    input.value = noteVal;
+                    input.className = "w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition";
+                    
+                    input.addEventListener('input', (e) => {
+                        gameState.notes[index] = e.target.value;
+                        saveState();
+                    });
+
+                    // Prevent click on input from triggering tile toggle
+                    input.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                    });
+
+                    bottomPart.appendChild(input);
+                    tileDiv.appendChild(bottomPart);
+                } else {
+                    // Free space indicator label
+                    const freeLabel = document.createElement('div');
+                    freeLabel.className = "mt-2 pt-2 border-t border-amber-300/40 text-center text-xs font-medium uppercase tracking-wider opacity-90";
+                    freeLabel.innerText = "Darmowe pole";
+                    tileDiv.appendChild(freeLabel);
+                }
+
+                boardContainer.appendChild(tileDiv);
+            });
+        }
+
+        // Reset functionality
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (confirm("Czy na pewno chcesz zresetować swoją planszę? Wszystkie zaznaczenia i wpisane notatki zostaną wyczyszczone.")) {
+                gameState.checked = Array(25).fill(false);
+                gameState.checked[12] = true; // Keep free space
+                gameState.notes = Array(25).fill('');
+                saveState();
+                renderBoard();
+                updateCounter();
+                checkBingo();
+            }
+        });
+
+        // Initialize on window load
+        window.onload = function() {
+            loadState();
+            renderBoard();
+            updateCounter();
+            checkBingo();
+        };
+    </script>
+</body>
+</html>
