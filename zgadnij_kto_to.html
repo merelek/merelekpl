@@ -531,7 +531,19 @@
       msgBox.className = 'p-4 rounded-2xl text-center bg-slate-900 border border-slate-700';
       msgText.innerText = '📡 Łączenie z komputerem Prowadzącego...';
 
-      const tempPeer = new Peer();
+      const peerConfig = {
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' }
+    ]
+  }
+};
+
+const tempPeer = new Peer(peerConfig);
 
       tempPeer.on('open', () => {
         const targetPeerId = 'ktotojest-room-' + targetCode;
@@ -586,8 +598,7 @@
       roomCode = numCode.toString();
       const peerId = 'ktotojest-room-' + roomCode;
 
-      peer = new Peer(peerId);
-
+peer = new Peer(peerId, peerConfig);
       peer.on('open', (id) => {
         document.getElementById('host-room-code-display').innerText = roomCode;
         document.getElementById('host-init-container').classList.add('hidden');
@@ -948,8 +959,7 @@
       if (!codeInput || !playerMyName) return;
 
       const targetHostPeerId = 'ktotojest-room-' + codeInput;
-      peer = new Peer();
-
+peer = new Peer(peerConfig);
       peer.on('open', () => {
         hostConn = peer.connect(targetHostPeerId);
 
