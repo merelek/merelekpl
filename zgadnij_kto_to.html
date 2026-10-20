@@ -54,7 +54,7 @@
       <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-purple-400 to-indigo-400 tracking-tight cursor-pointer" onclick="showView('view-mode-select')">
         🕵️ Kto To Jest?
       </h1>
-      <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej P2P</p>
+      <p class="text-slate-400 text-sm md:text-base mt-1">Interaktywny teleturniej P2P (Działa na Wi-Fi & LTE/5G)</p>
     </header>
 
     <!-- WIDOK 1: WYBÓR TRYBU -->
@@ -433,6 +433,20 @@
   </div>
 
   <script>
+    // --- PEŁNA KONFIGURACJA DARMOWYCH SERWERÓW STUN/TURN (Omijanie blokad LTE/5G) ---
+    const peerConfig = {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'turn:openrelay.metered.ca:80', username: 'openrelay', credential: 'openrelay' },
+          { urls: 'turn:openrelay.metered.ca:443', username: 'openrelay', credential: 'openrelay' },
+          { urls: 'turns:openrelay.metered.ca:443?transport=tcp', username: 'openrelay', credential: 'openrelay' }
+        ]
+      }
+    };
+
     // --- STAN GRY ---
     let myRole = null;
     let peer = null;
@@ -531,7 +545,7 @@
       msgBox.className = 'p-4 rounded-2xl text-center bg-slate-900 border border-slate-700';
       msgText.innerText = '📡 Łączenie z komputerem Prowadzącego...';
 
-      const tempPeer = new Peer();
+      const tempPeer = new Peer(peerConfig);
 
       tempPeer.on('open', () => {
         const targetPeerId = 'ktotojest-room-' + targetCode;
@@ -586,7 +600,7 @@
       roomCode = numCode.toString();
       const peerId = 'ktotojest-room-' + roomCode;
 
-      peer = new Peer(peerId);
+      peer = new Peer(peerId, peerConfig);
 
       peer.on('open', (id) => {
         document.getElementById('host-room-code-display').innerText = roomCode;
@@ -948,7 +962,7 @@
       if (!codeInput || !playerMyName) return;
 
       const targetHostPeerId = 'ktotojest-room-' + codeInput;
-      peer = new Peer();
+      peer = new Peer(peerConfig);
 
       peer.on('open', () => {
         hostConn = peer.connect(targetHostPeerId);
