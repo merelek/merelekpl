@@ -3,7 +3,7 @@
 // Dane do połączenia z Twoją bazą z phpMyAdmina
 $host = "localhost";
 $username = "43934480_merelekpl"; // Nazwa Twojego użytkownika (często taka sama jak baza)
-$password = "TUTAJ_WPISZ_SWOJE_HASLO"; // Hasło, którym logujesz się do bazy
+$password = "6rwWGI3B"; // Hasło, którym logujesz się do bazy
 $dbname = "43934480_merelekpl";
 
 // 1. Łączymy się z bazą danych
