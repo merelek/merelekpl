@@ -493,15 +493,7 @@
     } catch (_) {}
 
     // Przykładowe zadania wbudowane — właściwa baza może być importowana z pliku JSON.
-    let bazaZadan = [
-      {
-        id: "demo-logarytmy-1", category_id: "logarytmy", dzial: "Logarytmy",
-        poziom: "podstawa", typ: "zamkniete",
-        tresc: "Liczba $\\log_2 16 + \\log_3 9$ jest równa:",
-        odpowiedzi: ["4", "6", "2", "8"], poprawna: 1,
-        wyjasnienie: "$\\log_2 16=4$, a $\\log_3 9=2$, więc suma wynosi $6$."
-      }
-    ];
+    let bazaZadan = [];
 
     function categoryIdForTask(task) {
       if (task.category_id && dzialy.some(d => d.id === task.category_id)) return task.category_id;
