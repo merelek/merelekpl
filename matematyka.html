@@ -456,127 +456,102 @@
   </div>
 
   <script>
-    // Działy maturalne
-    const dzialy = [
-      { name: "Planimetria", icon: "🔷", hasRozszerzenie: true },
-      { name: "Geometria analityczna", icon: "📍", hasRozszerzenie: true },
-      { name: "Równania i nierówności", icon: "⚖️", hasRozszerzenie: true },
-      { name: "Ciągi", icon: "🔄", hasRozszerzenie: true },
-      { name: "Stereometria", icon: "🧊", hasRozszerzenie: true },
-      { name: "Trygonometria", icon: "📐", hasRozszerzenie: true },
-      { name: "Potęgi i pierwiastki", icon: "🌱", hasRozszerzenie: true },
-      { name: "Prawdopodobieństwo", icon: "🎯", hasRozszerzenie: true },
-      { name: "Funkcja kwadratowa", icon: "🏔️", hasRozszerzenie: true },
-      { name: "Funkcje", icon: "📈", hasRozszerzenie: true },
-      { name: "Logarytmy", icon: "🐚", hasRozszerzenie: true },
-      { name: "Wyrażenia algebraiczne", icon: "🧮", hasRozszerzenie: true },
-      { name: "Liczby rzeczywiste", icon: "🔢", hasRozszerzenie: true },
-      { name: "Funkcja liniowa", icon: "✏️", hasRozszerzenie: false },
-      { name: "Procenty", icon: "💯", hasRozszerzenie: false },
-      { name: "Statystyka", icon: "📊", hasRozszerzenie: false },
-      { name: "Kombinatoryka", icon: "🎲", hasRozszerzenie: true },
-      { name: "Rachunek różniczkowy", icon: "♾️", isRozszerzenieOnly: true },
-      { name: "Równania z parametrem", icon: "🔣", isRozszerzenieOnly: true },
-      { name: "Układy równań", icon: "🔗", hasRozszerzenie: false },
-      { name: "Wartość bezwzględna", icon: "💎", isRozszerzenieOnly: true },
-      { name: "Wielomiany", icon: "🧩", hasRozszerzenie: true },
-      { name: "Funkcja wykładnicza", icon: "🚀", hasRozszerzenie: true },
-      { name: "Optymalizacja", icon: "⚙️", hasRozszerzenie: true },
-      { name: "Inne", icon: "📝", hasRozszerzenie: false }
+    // Kategorie mają stałe identyfikatory. Nazwa może się zmienić bez utraty przypisania zadań.
+    let dzialy = [
+      { id: "liczby-rzeczywiste", name: "Liczby rzeczywiste i potęgi", icon: "🔢", hasRozszerzenie: true },
+      { id: "procenty", name: "Procenty i procent składany", icon: "💯", hasRozszerzenie: false },
+      { id: "logarytmy", name: "Logarytmy", icon: "🐚", hasRozszerzenie: true },
+      { id: "wyrazenia-algebraiczne", name: "Wyrażenia algebraiczne", icon: "🧮", hasRozszerzenie: true },
+      { id: "rownania-nierownosci", name: "Równania i nierówności", icon: "⚖️", hasRozszerzenie: true },
+      { id: "wielomiany", name: "Wielomiany", icon: "🧩", hasRozszerzenie: true },
+      { id: "funkcje", name: "Funkcje i ich własności", icon: "📈", hasRozszerzenie: true },
+      { id: "funkcja-kwadratowa", name: "Funkcja kwadratowa", icon: "🏔️", hasRozszerzenie: true },
+      { id: "ciagi", name: "Ciągi", icon: "🔄", hasRozszerzenie: true },
+      { id: "trygonometria", name: "Trygonometria", icon: "📐", hasRozszerzenie: true },
+      { id: "planimetria", name: "Planimetria", icon: "🔷", hasRozszerzenie: true },
+      { id: "geometria-analityczna", name: "Geometria analityczna", icon: "📍", hasRozszerzenie: true },
+      { id: "stereometria", name: "Stereometria", icon: "🧊", hasRozszerzenie: true },
+      { id: "kombinatoryka", name: "Kombinatoryka", icon: "🎲", hasRozszerzenie: true },
+      { id: "prawdopodobienstwo", name: "Prawdopodobieństwo", icon: "🎯", hasRozszerzenie: true },
+      { id: "statystyka", name: "Statystyka", icon: "📊", hasRozszerzenie: false },
+      { id: "rachunek-rozniczkowy", name: "Rachunek różniczkowy", icon: "♾️", isRozszerzenieOnly: true },
+      { id: "optymalizacja", name: "Optymalizacja", icon: "⚙️", hasRozszerzenie: true },
+      { id: "inne", name: "Inne", icon: "📝", hasRozszerzenie: false }
     ];
 
-    // Domyślna baza zadań
+    // Przywróć kategorie zapisane wcześniej w tej przeglądarce.
+    try {
+      const savedCategories = JSON.parse(localStorage.getItem('sm_categories'));
+      if (Array.isArray(savedCategories) && savedCategories.length) dzialy = savedCategories;
+    } catch (_) {}
+
+    // Przykładowe zadania wbudowane — właściwa baza może być importowana z pliku JSON.
     let bazaZadan = [
       {
-        id: 1,
-        dzial: "Logarytmy",
-        poziom: "podstawa",
-        typ: "zamkniete",
+        id: "demo-logarytmy-1", category_id: "logarytmy", dzial: "Logarytmy",
+        poziom: "podstawa", typ: "zamkniete",
         tresc: "Liczba $\\log_2 16 + \\log_3 9$ jest równa:",
-        odpowiedzi: ["4", "6", "2", "8"],
-        poprawna: 1,
-        wyjasnienie: "$\\log_2 16 = 4$ ponieważ $2^4=16$. \\n$\\log_3 9 = 2$ ponieważ $3^2=9$. \\nStąd $4 + 2 = 6$."
-      },
-      {
-        id: 2,
-        dzial: "Równania i nierówności",
-        poziom: "podstawa",
-        typ: "zamkniete",
-        tresc: "Rozwiązaniem równania $\\frac{x-2}{3} = 4$ jest liczba:",
-        odpowiedzi: ["10", "14", "12", "8"],
-        poprawna: 1,
-        wyjasnienie: "Mnożymy obustronnie przez 3: $x - 2 = 12$, stąd $x = 14$."
-      },
-      {
-        id: 3,
-        dzial: "Rachunek różniczkowy",
-        poziom: "rozszerzenie",
-        typ: "otwarte",
-        punkty: 3,
-        tresc: "Oblicz pochodną funkcji $f(x) = x^3 - 4x^2 + 7x - 1$ w punkcie $x_0 = 2$.",
-        odpowiedzi: [],
-        poprawna: null,
-        wyjasnienie: "1. Liczymy pochodną: $f'(x) = 3x^2 - 8x + 7$. \\n2. Podstawiamy $x_0 = 2$: $f'(2) = 3(2)^2 - 8(2) + 7 = 12 - 16 + 7 = 3$."
+        odpowiedzi: ["4", "6", "2", "8"], poprawna: 1,
+        wyjasnienie: "$\\log_2 16=4$, a $\\log_3 9=2$, więc suma wynosi $6$."
       }
     ];
 
+    function categoryIdForTask(task) {
+      if (task.category_id && dzialy.some(d => d.id === task.category_id)) return task.category_id;
+      const byName = dzialy.find(d => d.name === task.dzial);
+      return byName ? byName.id : "inne";
+    }
+
+    // Przywróć zaimportowane zadania po ponownym otwarciu strony.
+    try {
+      const savedTasks = JSON.parse(localStorage.getItem('sm_tasks'));
+      if (Array.isArray(savedTasks) && savedTasks.length) bazaZadan = savedTasks;
+    } catch (_) {}
+
     // Stan aplikacji (zapisywany w localStorage)
-    let userStats = JSON.parse(localStorage.getItem('sm_stats')) || { solved: {}, correct: 0, total: 0 };
+    let userStats = { solved: {}, correct: 0, total: 0 };
+    try { userStats = JSON.parse(localStorage.getItem('sm_stats')) || userStats; } catch (_) {}
 
     function saveStats() {
       localStorage.setItem('sm_stats', JSON.stringify(userStats));
     }
 
-    // Ładowanie kafelków
+    // Ładowanie kafelków kategorii
     function renderCategories() {
       const container = document.getElementById('categories-list');
       container.innerHTML = '';
-
       dzialy.forEach(d => {
-        const countAll = bazaZadan.filter(z => z.dzial === d.name).length;
-        const countRozsz = bazaZadan.filter(z => z.dzial === d.name && z.poziom === 'rozszerzenie').length;
-
+        const tasksInCategory = bazaZadan.filter(z => categoryIdForTask(z) === d.id);
+        const countAll = tasksInCategory.length;
+        const countRozsz = tasksInCategory.filter(z => z.poziom === 'rozszerzenie').length;
         const card = document.createElement('div');
         card.className = 'category-card';
-        card.onclick = () => openCategory(d.name);
-
-        let rozszBadge = d.isRozszerzenieOnly ? `<span class="badge-rozsz">Tylko Rozszerzenie</span>` : 
-                         (d.hasRozszerzenie ? `<span class="badge-rozsz">+${countRozsz} rozszerzenie</span>` : '');
-
+        card.onclick = () => openCategory(d.id);
+        let rozszBadge = d.isRozszerzenieOnly ? `<span class="badge-rozsz">Tylko rozszerzenie</span>` :
+          (d.hasRozszerzenie ? `<span class="badge-rozsz">${countRozsz} rozszerz.</span>` : '');
         card.innerHTML = `
-          <div class="cat-header">
-            <span class="cat-icon">${d.icon}</span>
-            <span class="cat-title">${d.name}</span>
-            ${rozszBadge}
-          </div>
+          <div class="cat-header"><span class="cat-icon">${d.icon}</span><span class="cat-title">${d.name}</span>${rozszBadge}</div>
           <div class="cat-stats">${countAll} zadań w bazie</div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 0%"></div>
-          </div>
-        `;
+          <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>`;
         container.appendChild(card);
       });
     }
 
-    // Otwarcie konkretnego działu
-    function openCategory(dzialName) {
+    // Otwarcie kategorii po stabilnym ID
+    function openCategory(categoryId) {
+      const category = dzialy.find(d => d.id === categoryId) || dzialy.find(d => d.name === categoryId);
+      if (!category) return;
       document.getElementById('view-learn').classList.add('hidden');
       document.getElementById('view-tasks').classList.remove('hidden');
-      document.getElementById('current-category-title').innerText = dzialName;
-
-      const tasks = bazaZadan.filter(z => z.dzial === dzialName);
+      document.getElementById('current-category-title').innerText = category.name;
+      const tasks = bazaZadan.filter(z => categoryIdForTask(z) === category.id);
       const container = document.getElementById('tasks-container');
       container.innerHTML = '';
-
       if (tasks.length === 0) {
-        container.innerHTML = `<p style="color: var(--text-muted);">Brak zadań w tym dziale. Importuj bazę JSON z zadaniami!</p>`;
+        container.innerHTML = `<p style="color:var(--text-muted);">Brak zadań w tym dziale. Importuj plik JSON z zadaniami.</p>`;
         return;
       }
-
-      tasks.forEach(t => {
-        container.appendChild(createTaskElement(t));
-      });
-
+      tasks.forEach(t => container.appendChild(createTaskElement(t)));
       if (window.MathJax) MathJax.typesetPromise();
     }
 
@@ -591,16 +566,16 @@
       if (t.typ === 'zamkniete') {
         optionsHTML = `<div class="options-grid">` + 
           t.odpowiedzi.map((opt, i) => `
-            <button class="option-btn" onclick="checkAnswer(${t.id}, ${i}, this)">
+            <button class="option-btn" onclick='checkAnswer(${JSON.stringify(t.id)}, ${i}, this)'>
               <strong>${String.fromCharCode(65 + i)}.</strong> ${opt}
             </button>
           `).join('') + `</div>`;
       } else {
         optionsHTML = `
           <div class="open-task-actions">
-            <button class="btn-action btn-show" onclick="toggleExplanation(${t.id})">Pokaż Rozwiązanie CKE</button>
-            <button class="btn-action btn-correct" onclick="markOpenTask(${t.id}, true)">Rozwiązano Poprawnie</button>
-            <button class="btn-action btn-wrong" onclick="markOpenTask(${t.id}, false)">Błąd</button>
+            <button class="btn-action btn-show" onclick='toggleExplanation(${JSON.stringify(t.id)})'>Pokaż Rozwiązanie CKE</button>
+            <button class="btn-action btn-correct" onclick='markOpenTask(${JSON.stringify(t.id)}, true)'>Rozwiązano Poprawnie</button>
+            <button class="btn-action btn-wrong" onclick='markOpenTask(${JSON.stringify(t.id)}, false)'>Błąd</button>
           </div>
         `;
       }
@@ -608,9 +583,10 @@
       card.innerHTML = `
         <div class="task-meta">
           <span class="task-badge ${badgeClass}">${t.poziom}</span>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">Zadanie #${t.id}</span>
+          <span style="font-size:0.8rem;color:var(--text-muted);">${t.paper ? `${t.paper} · ` : ''}Zadanie ${t.number ?? t.id}${t.points != null ? ` · ${t.points} pkt` : ''}</span>
         </div>
         <div class="task-content">${t.tresc}</div>
+        ${t.zrodlo ? `<div style="font-size:.82rem;color:var(--text-muted);margin-bottom:12px;">Źródło: ${t.zrodlo}</div>` : ''}
         ${optionsHTML}
         <div class="explanation-box" id="exp-${t.id}">
           <strong>Wyjaśnienie / Krok po kroku:</strong><br>
@@ -693,22 +669,71 @@
       }
     }
 
-    // Import zewnętrznej bazy danych JSON
+    // Import JSON: obsługuje nowy format {version,categories,tasks} i stary format tablicy.
+    // Import dodaje/aktualizuje zadania po ID, nie kasuje innych zadań.
     function importDatabase(event) {
-      const file = event.target.files[0];
+      const file = event.target.files && event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          const importedData = JSON.parse(e.target.result);
-          if (Array.isArray(importedData)) {
-            bazaZadan = importedData;
-            alert(`Pomyślnie zaimportowano ${bazaZadan.length} zadań!`);
-            renderCategories();
+          const parsed = JSON.parse(e.target.result);
+          const importedCategories = Array.isArray(parsed) ? [] : parsed.categories;
+          const importedTasks = Array.isArray(parsed) ? parsed : parsed.tasks;
+          if (!Array.isArray(importedTasks)) throw new Error('Brak tablicy tasks.');
+
+          if (Array.isArray(importedCategories)) {
+            importedCategories.forEach(c => {
+              if (!c || !c.id || !c.name) return;
+              const existing = dzialy.find(d => d.id === c.id);
+              if (existing) Object.assign(existing, c);
+              else dzialy.push({ icon: '📝', hasRozszerzenie: true, ...c });
+            });
           }
+
+          const normalized = importedTasks.map((t, index) => {
+            if (!t || typeof t !== 'object' || !t.tresc) throw new Error(`Zadanie ${index + 1} nie ma pola tresc.`);
+            const task = { ...t };
+            if (task.id == null) task.id = `import-${Date.now()}-${index}`;
+            if (!task.poziom) task.poziom = 'podstawa';
+            if (!task.typ) task.typ = Array.isArray(task.odpowiedzi) && task.odpowiedzi.length ? 'zamkniete' : 'otwarte';
+            if (!Array.isArray(task.odpowiedzi)) task.odpowiedzi = [];
+            if (task.typ === 'zamkniete' && (!Number.isInteger(task.poprawna) || task.poprawna < 0 || task.poprawna >= task.odpowiedzi.length)) {
+              throw new Error(`Zadanie ${task.number ?? task.id}: poprawna musi być indeksem odpowiedzi od 0.`);
+            }
+            if (task.category_id && !dzialy.some(d => d.id === task.category_id)) {
+              const provided = importedCategories.find(c => c.id === task.category_id);
+              if (provided) dzialy.push({ icon: '📝', hasRozszerzenie: true, ...provided });
+              else task.category_id = 'inne';
+            }
+            if (!task.category_id) {
+              const legacyName = task.dzial || 'Inne';
+              let category = dzialy.find(d => d.name === legacyName);
+              if (!category) {
+                const id = legacyName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'inne';
+                category = { id, name: legacyName, icon: '📝', hasRozszerzenie: true };
+                dzialy.push(category);
+              }
+              task.category_id = category.id;
+              task.dzial = category.name;
+            } else {
+              const category = dzialy.find(d => d.id === task.category_id);
+              task.dzial = category ? category.name : (task.dzial || 'Inne');
+            }
+            return task;
+          });
+
+          const byId = new Map(bazaZadan.map(t => [String(t.id), t]));
+          normalized.forEach(t => byId.set(String(t.id), t));
+          bazaZadan = Array.from(byId.values());
+          localStorage.setItem('sm_tasks', JSON.stringify(bazaZadan));
+          localStorage.setItem('sm_categories', JSON.stringify(dzialy));
+          renderCategories();
+          alert(`Zaimportowano/zaaktualizowano ${normalized.length} zadań. Łącznie w bazie: ${bazaZadan.length}.`);
         } catch (err) {
-          alert("Błąd podczas odczytu pliku JSON. Upewnij się, że plik ma poprawną strukturę.");
+          alert(`Nie udało się zaimportować JSON: ${err.message || 'sprawdź strukturę pliku.'}`);
+        } finally {
+          event.target.value = '';
         }
       };
       reader.readAsText(file);
