@@ -1,1147 +1,751 @@
 <!DOCTYPE html>
-<html lang="pl" class="h-full">
+<html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprawna Matura - Matematyka Podstawowa i Rozszerzona</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
-                        },
-                        accent: {
-                            500: '#6366f1',
-                            600: '#4f46e5'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- KaTeX for Math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .katex-display { margin: 0.5em 0; overflow-x: auto; overflow-y: hidden; }
-        /* Scratchpad canvas */
-        #scratchpadCanvas { touch-action: none; cursor: crosshair; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprawna Matura - Matematyka</title>
+  
+  <!-- MathJax do ładnego renderowania wzorów matematycznych -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['[', ']']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+      --badge-rozsz: #8b5cf6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text-main);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .nav-btn.active, .nav-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 1rem;
+    }
+
+    /* Grid Działów */
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 15px;
+    }
+
+    .category-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+
+    .category-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .cat-icon {
+      font-size: 1.2rem;
+    }
+
+    .cat-title {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .cat-stats {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .badge-rozsz {
+      background: #f3e8ff;
+      color: var(--badge-rozsz);
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-left: auto;
+    }
+
+    /* Widok Zadań */
+    .tasks-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .back-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .task-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .task-badge {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-podstawa { background: #e0e7ff; color: #3730a3; }
+    .badge-rozszerzenie { background: #f3e8ff; color: #6b21a8; }
+
+    .task-content {
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 600px) {
+      .options-grid { grid-template-columns: 1fr; }
+    }
+
+    .option-btn {
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .option-btn.correct {
+      background: #d1fae5 !important;
+      border-color: #10b981 !important;
+      color: #065f46;
+    }
+
+    .option-btn.wrong {
+      background: #fee2e2 !important;
+      border-color: #ef4444 !important;
+      color: #991b1b;
+    }
+
+    .explanation-box {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f0f9ff;
+      border-left: 4px solid #0284c7;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .explanation-box.visible {
+      display: block;
+    }
+
+    .open-task-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-action {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-show { background: var(--primary); color: white; }
+    .btn-correct { background: var(--success); color: white; }
+    .btn-wrong { background: var(--danger); color: white; }
+
+    /* Modal / Narzędzia */
+    .tools-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Brudnopis */
+    #scratchpad {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      display: none;
+      z-index: 1000;
+    }
+
+    #scratchpad.open { display: block; }
+
+    .scratch-header {
+      background: var(--primary);
+      color: white;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 10px 10px 0 0;
+    }
+
+    canvas {
+      display: block;
+      background: #fff;
+      cursor: crosshair;
+    }
+
+    .scratch-tools {
+      padding: 8px;
+      display: flex;
+      gap: 5px;
+      background: #f1f5f9;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .hidden { display: none !important; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-full flex flex-col transition-colors duration-200">
+<body>
 
-    <!-- TOP NAVIGATION -->
-    <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-800/90 backdrop-blur border-b border-slate-200 dark:border-slate-700 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <!-- Logo -->
-                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-emerald-700 flex items-center justify-center text-white font-bold text-xl shadow-md">
-                        <i class="fa-solid fa-square-root-variable"></i>
-                    </div>
-                    <div>
-                        <span class="text-xl font-bold bg-gradient-to-r from-brand-600 to-emerald-800 dark:from-brand-500 dark:to-emerald-400 bg-clip-text text-transparent">SprawnaMatura</span>
-                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-brand-100 text-brand-800 dark:bg-brand-900/60 dark:text-brand-300 ml-1">MATEMATYKA</span>
-                    </div>
-                </div>
+  <header>
+    <div class="header-container">
+      <div class="logo" onclick="switchTab('learn')">
+        <span>📐</span> Sprawna Matura
+      </div>
+      <nav>
+        <button class="nav-btn active" id="btn-learn" onclick="switchTab('learn')">Działy</button>
+        <button class="nav-btn" id="btn-exam" onclick="switchTab('exam')">Arkusz Maturalny</button>
+        <button class="nav-btn" id="btn-stats" onclick="switchTab('stats')">Statystyki</button>
+        <button class="nav-btn" onclick="toggleScratchpad()">✏️ Brudnopis</button>
+      </nav>
+    </div>
+  </header>
 
-                <!-- Desktop Navigation Links -->
-                <nav class="hidden md:flex space-x-1 lg:space-x-2">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition-colors text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30">
-                        <i class="fa-solid fa-chart-pie mr-1.5"></i> Pulpit
-                    </button>
-                    <button onclick="switchTab('study')" id="nav-study" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        <i class="fa-solid fa-book-open mr-1.5"></i> Baza Zadań
-                    </button>
-                    <button onclick="switchTab('exam')" id="nav-exam" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        <i class="fa-solid fa-clock mr-1.5"></i> Generator Arkuszy
-                    </button>
-                    <button onclick="switchTab('saved')" id="nav-saved" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition-colors text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        <i class="fa-solid fa-bookmark mr-1.5"></i> Zapisane (<span id="saved-count">0</span>)
-                    </button>
-                </nav>
+  <div class="container">
 
-                <!-- Action Controls -->
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <button onclick="openFormulasModal()" title="Karta wzorów CKE" class="px-3 py-2 text-xs sm:text-sm font-medium rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-300/40 hover:bg-amber-500/20 transition">
-                        <i class="fa-solid fa-square-root-square mr-1"></i> <span class="hidden sm:inline">Wzory CKE</span>
-                    </button>
-                    <button onclick="toggleScratchpad()" title="Włącz Brudnopis" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
-                        <i class="fa-solid fa-pen-line text-lg"></i>
-                    </button>
-                    <button onclick="toggleTheme()" title="Przełącz motyw" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300">
-                        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
-                    </button>
-                </div>
-            </div>
+    <!-- SEKACJA 1: DZIAŁY TEMATYCZNE -->
+    <div id="view-learn">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 class="section-title">Działy tematyczne</h1>
+        <div>
+          <label class="nav-btn" style="cursor: pointer;">
+            📥 Importuj JSON
+            <input type="file" id="import-json" accept=".json" style="display: none;" onchange="importDatabase(event)">
+          </label>
         </div>
-
-        <!-- Mobile Nav bar -->
-        <div class="md:hidden flex border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 justify-around text-xs">
-            <button onclick="switchTab('dashboard')" class="flex flex-col items-center p-2 text-brand-600 dark:text-brand-400">
-                <i class="fa-solid fa-chart-pie text-base mb-0.5"></i> Pulpit
-            </button>
-            <button onclick="switchTab('study')" class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-300">
-                <i class="fa-solid fa-book-open text-base mb-0.5"></i> Nauki
-            </button>
-            <button onclick="switchTab('exam')" class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-300">
-                <i class="fa-solid fa-clock text-base mb-0.5"></i> Arkusz
-            </button>
-            <button onclick="switchTab('saved')" class="flex flex-col items-center p-2 text-slate-600 dark:text-slate-300">
-                <i class="fa-solid fa-bookmark text-base mb-0.5"></i> Zapisane
-            </button>
-        </div>
-    </header>
-
-    <!-- MAIN CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <!-- TAB 1: DASHBOARD -->
-        <div id="tab-dashboard" class="tab-content space-y-6">
-            <!-- Hero Banner -->
-            <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-                <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none">
-                    <i class="fa-solid fa-calculator text-9xl"></i>
-                </div>
-                <div class="relative z-10 max-w-2xl">
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/20 border border-brand-400/30 text-brand-300 mb-3">
-                        <i class="fa-solid fa-circle-check mr-1"></i> Tryb Pracy Lokalnej (100% Darmowy)
-                    </span>
-                    <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">
-                        Opanuj Matematykę Maturalną
-                    </h1>
-                    <p class="text-slate-300 text-sm sm:text-base mb-6">
-                        Rozwiązuj oficjalne i wzorcowe zadania z poziomu podstawowego i rozszerzonego. Przeglądaj rozwiązania krok po kroku i śledź statystyki w jednym miejscu.
-                    </p>
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="switchTab('study')" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-sm shadow-lg shadow-brand-500/30 transition transform hover:-translate-y-0.5">
-                            <i class="fa-solid fa-play mr-2"></i> Rozpocznij Naukę Działami
-                        </button>
-                        <button onclick="switchTab('exam')" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold text-sm border border-slate-700 transition">
-                            <i class="fa-solid fa-dice mr-2"></i> Wygeneruj Arkusz
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Stats Overview -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Rozwiązane zadania</p>
-                        <h3 id="stat-total-solved" class="text-2xl font-bold mt-1 text-slate-800 dark:text-slate-100">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-check-double"></i>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Średnia skuteczność</p>
-                        <h3 id="stat-accuracy" class="text-2xl font-bold mt-1 text-brand-600 dark:text-brand-400">0%</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-bullseye"></i>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Poziom Podstawowy</p>
-                        <h3 id="stat-podstawa" class="text-2xl font-bold mt-1 text-slate-800 dark:text-slate-100">0 / 0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                </div>
-                <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Poziom Rozszerzony</p>
-                        <h3 id="stat-rozszerzenie" class="text-2xl font-bold mt-1 text-purple-600 dark:text-purple-400">0 / 0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-brain"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Topics Grid -->
-            <div>
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">Działy Tematyczne</h2>
-                    <div class="flex gap-2">
-                        <button onclick="filterLevel('all')" id="btn-lvl-all" class="px-3 py-1 text-xs rounded-lg font-medium bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900">Wszystkie</button>
-                        <button onclick="filterLevel('podstawa')" id="btn-lvl-podstawa" class="px-3 py-1 text-xs rounded-lg font-medium bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300">Podstawa</button>
-                        <button onclick="filterLevel('rozszerzenie')" id="btn-lvl-rozszerzenie" class="px-3 py-1 text-xs rounded-lg font-medium bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300">Rozszerzenie</button>
-                    </div>
-                </div>
-
-                <div id="topics-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Dynamic topic cards -->
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 2: STUDY MODE (Tasks List) -->
-        <div id="tab-study" class="tab-content hidden space-y-6">
-            <!-- Filters bar -->
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-wrap gap-4 items-center justify-between">
-                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">Poziom:</label>
-                        <select id="filter-study-level" onchange="renderStudyTasks()" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm focus:ring-2 focus:ring-brand-500">
-                            <option value="all">Wszystkie Poziomy</option>
-                            <option value="Podstawowy">Poziom Podstawowy</option>
-                            <option value="Rozszerzony">Poziom Rozszerzony</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">Dział:</label>
-                        <select id="filter-study-topic" onchange="renderStudyTasks()" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm focus:ring-2 focus:ring-brand-500">
-                            <option value="all">Wszystkie Działy</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 mb-1">Typ zadania:</label>
-                        <select id="filter-study-type" onchange="renderStudyTasks()" class="px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm focus:ring-2 focus:ring-brand-500">
-                            <option value="all">Wszystkie Typy</option>
-                            <option value="zamknięte">Zamknięte (A/B/C/D)</option>
-                            <option value="otwarte">Otwarte</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="text-xs text-slate-500 dark:text-slate-400">
-                    Znaleziono: <span id="study-task-count" class="font-bold text-slate-800 dark:text-slate-200">0</span> zadań
-                </div>
-            </div>
-
-            <!-- Tasks Container -->
-            <div id="study-tasks-list" class="space-y-6">
-                <!-- Dynamic task cards -->
-            </div>
-        </div>
-
-        <!-- TAB 3: EXAM GENERATOR -->
-        <div id="tab-exam" class="tab-content hidden space-y-6">
-            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm max-w-3xl mx-auto">
-                <div class="text-center mb-6">
-                    <div class="w-14 h-14 bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3">
-                        <i class="fa-solid fa-file-signature"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold">Generator Losowego Arkusza</h2>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">
-                        Wygeneruj zbalansowany zestaw zadań wzorowany na arkuszach CKE.
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40">
-                        <label class="block text-sm font-semibold mb-2">Poziom Arkusza:</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="exam-level" value="Podstawowy" checked class="text-brand-600 focus:ring-brand-500">
-                                <span class="text-sm font-medium">Podstawowy (170 min w oryginale)</span>
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="radio" name="exam-level" value="Rozszerzony" class="text-brand-600 focus:ring-brand-500">
-                                <span class="text-sm font-medium">Rozszerzony (180 min w oryginale)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/40">
-                        <label class="block text-sm font-semibold mb-2">Liczba zadań w teście:</label>
-                        <select id="exam-task-limit" class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm">
-                            <option value="5">Mini test (5 zadań)</option>
-                            <option value="8" selected>Standardowy test (8 zadań)</option>
-                            <option value="12">Pełniejsza próba (12 zadań)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button onclick="startExam()" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base shadow-lg shadow-brand-600/30 transition">
-                    <i class="fa-solid fa-play mr-2"></i> Generuj Arkusz i Rozpocznij
-                </button>
-            </div>
-
-            <!-- Active Exam Area -->
-            <div id="active-exam-container" class="hidden space-y-6">
-                <!-- Exam Header Sticky Bar -->
-                <div class="bg-slate-900 text-white p-4 rounded-xl shadow-md flex justify-between items-center sticky top-20 z-30">
-                    <div>
-                        <span id="exam-badge-level" class="text-xs uppercase font-bold px-2 py-0.5 rounded bg-brand-500/30 text-brand-300">PODSTAWOWY</span>
-                        <h3 class="text-lg font-bold mt-0.5">Arkusz Próbny</h3>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="text-right">
-                            <span class="text-xs text-slate-400 block">Czas:</span>
-                            <span id="exam-timer" class="font-mono text-xl font-bold text-amber-400">00:00</span>
-                        </div>
-                        <button onclick="finishExam()" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold text-xs sm:text-sm">
-                            Zakończ Arkusz
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Exam Tasks -->
-                <div id="exam-tasks-list" class="space-y-6"></div>
-            </div>
-        </div>
-
-        <!-- TAB 4: SAVED / BOOKMARKS -->
-        <div id="tab-saved" class="tab-content hidden space-y-6">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h2 class="text-2xl font-bold">Zapisane Zadania</h2>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm">Trudne zadania dodane do Twojej listy powtórkowej.</p>
-                </div>
-            </div>
-            <div id="saved-tasks-list" class="space-y-6">
-                <!-- Dynamic saved tasks -->
-            </div>
-        </div>
-    </main>
-
-    <!-- SCRATCHPAD / BRUDNOPIS DRAWER -->
-    <div id="scratchpad-modal" class="fixed inset-0 bg-black/50 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700">
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-pen-ruler text-brand-600 dark:text-brand-400"></i>
-                    <h3 class="font-bold text-slate-800 dark:text-slate-100">Interaktywny Brudnopis do Obliczeń</h3>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="clearScratchpad()" class="px-3 py-1.5 rounded-lg bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-300 text-xs font-medium hover:bg-red-200">
-                        <i class="fa-solid fa-trash mr-1"></i> Wyczyść
-                    </button>
-                    <button onclick="toggleScratchpad()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                        <i class="fa-solid fa-xmark text-xl"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="flex-grow relative bg-slate-50 dark:bg-slate-900">
-                <canvas id="scratchpadCanvas" class="w-full h-full"></canvas>
-            </div>
-            <div class="p-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-between text-xs text-slate-500">
-                <span>Możesz tu rysować myszką lub palcem na ekranie dotykowym.</span>
-                <span class="font-semibold text-brand-600">Szybkie kalkulacje bez użycia papieru</span>
-            </div>
-        </div>
+      </div>
+      <div class="categories-grid" id="categories-list">
+        <!-- Kafelki generowane w JS -->
+      </div>
     </div>
 
-    <!-- FORMULAS CKE MODAL -->
-    <div id="formulas-modal" class="fixed inset-0 bg-black/60 z-50 hidden backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl h-[85vh] flex flex-col overflow-hidden">
-            <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-900 text-white">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-book-bookmark text-amber-400"></i>
-                    <h3 class="font-bold">Szybka Karta Wzorów CKE</h3>
-                </div>
-                <button onclick="closeFormulasModal()" class="text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-grow space-y-6 text-sm">
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4">
-                    <h4 class="font-bold text-brand-600 dark:text-brand-400 text-base mb-2">1. Wzory skróconego mnożenia</h4>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded mb-1">\( (a+b)^2 = a^2 + 2ab + b^2 \)</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded mb-1">\( (a-b)^2 = a^2 - 2ab + b^2 \)</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded">\( a^2 - b^2 = (a-b)(a+b) \)</p>
-                </div>
-
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4">
-                    <h4 class="font-bold text-brand-600 dark:text-brand-400 text-base mb-2">2. Trójmian kwadratowy & Funkcja kwadratowa</h4>
-                    <p class="mb-1">Postać ogólna: \( f(x) = ax^2 + bx + c \)</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded mb-1">Wyróżnik (Delta): \( \Delta = b^2 - 4ac \)</p>
-                    <p class="mb-1">Wierzchołek paraboli: \( W = (p, q) \), gdzie \( p = \frac{-b}{2a} \), \( q = \frac{-\Delta}{4a} \)</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded">Pierwiastki (\(\Delta > 0\)): \( x_1 = \frac{-b-\sqrt{\Delta}}{2a} \), \( x_2 = \frac{-b+\sqrt{\Delta}}{2a} \)</p>
-                </div>
-
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4">
-                    <h4 class="font-bold text-brand-600 dark:text-brand-400 text-base mb-2">3. Ciągi liczbowe</h4>
-                    <p class="font-semibold mt-2">Ciąg Arytmetyczny:</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded mb-1">\( a_n = a_1 + (n-1)r \)</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded mb-1">\( S_n = \frac{a_1 + a_n}{2} \cdot n \)</p>
-                    <p class="font-semibold mt-2">Ciąg Geometryczny:</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded mb-1">\( a_n = a_1 \cdot q^{n-1} \)</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded">\( S_n = a_1 \frac{1 - q^n}{1 - q} \quad (q \neq 1) \)</p>
-                </div>
-
-                <div class="border-b border-slate-200 dark:border-slate-700 pb-4">
-                    <h4 class="font-bold text-brand-600 dark:text-brand-400 text-base mb-2">4. Geometria Analityczna</h4>
-                    <p class="mb-1">Długość odcinka AB: \( |AB| = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2} \)</p>
-                    <p class="mb-1">Środek odcinka AB: \( S = \left(\frac{x_A+x_B}{2}, \frac{y_A+y_B}{2}\right) \)</p>
-                    <p class="mb-1">Równanie prostej: \( y = ax + b \)</p>
-                    <p class="text-xs text-slate-500">Proste prostopadłe: \( a_1 \cdot a_2 = -1 \). Proste równoległe: \( a_1 = a_2 \).</p>
-                </div>
-
-                <div>
-                    <h4 class="font-bold text-brand-600 dark:text-brand-400 text-base mb-2">5. Pochodna funkcji (Poziom Rozszerzony)</h4>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded mb-1">\( (x^n)' = n \cdot x^{n-1} \)</p>
-                    <p class="font-mono bg-slate-100 dark:bg-slate-700/50 p-2 rounded">\( [f(x) \cdot g(x)]' = f'(x)g(x) + f(x)g'(x) \)</p>
-                </div>
-            </div>
-        </div>
+    <!-- SEKCJA 2: LISTA ZADAŃ W DZIALE -->
+    <div id="view-tasks" class="hidden">
+      <div class="tasks-header">
+        <button class="back-btn" onclick="switchTab('learn')">← Powrót do działów</button>
+        <h2 id="current-category-title">Nazwa Działu</h2>
+      </div>
+      <div id="tasks-container">
+        <!-- Zadania generowane w JS -->
+      </div>
     </div>
 
-    <!-- JAVASCRIPT APPLICATION LOGIC -->
-    <script>
-        // =========================================================================
-        // 1. COMPREHENSIVE MATH TASKS DATABASE (PODSTAWOWY & ROZSZERZONY)
-        // =========================================================================
-        const TASKS_DB = [
-            // LICZBY RZECZYWISTE I POTĘGI
-            {
-                id: "p1",
-                level: "Podstawowy",
-                topic: "Liczby rzeczywiste i potęgi",
-                type: "zamknięte",
-                points: 1,
-                question: "Liczba \\( (2\\sqrt{3} - 3)^2 \\) jest równa:",
-                options: [
-                    "\\( 21 - 12\\sqrt{3} \\)",
-                    "\\( 3 - 12\\sqrt{3} \\)",
-                    "\\( 21 \\)",
-                    "\\( 3 \\)"
-                ],
-                correctOption: 0,
-                solution: "Korzystamy ze wzoru skróconego mnożenia \\( (a-b)^2 = a^2 - 2ab + b^2 \\):\n\n" +
-                          "\\[ (2\\sqrt{3}-3)^2 = (2\\sqrt{3})^2 - 2\\cdot(2\\sqrt{3})\\cdot 3 + 3^2 \\]\n" +
-                          "\\[ = 4\\cdot 3 - 12\\sqrt{3} + 9 = 12 - 12\\sqrt{3} + 9 = 21 - 12\\sqrt{3} \\]\n\n" +
-                          "Prawidłowa odpowiedź to **A**."
-            },
-            {
-                id: "p2",
-                level: "Podstawowy",
-                topic: "Liczby rzeczywiste i potęgi",
-                type: "zamknięte",
-                points: 1,
-                question: "Wartość wyrażenia \\( \\log_3 36 - \\log_3 4 \\) jest równa:",
-                options: [
-                    "\\( 2 \\)",
-                    "\\( 3 \\)",
-                    "\\( 8 \\)",
-                    "\\( \\log_3 32 \\)"
-                ],
-                correctOption: 0,
-                solution: "Stosujemy wzór na różnicę logarytmów o takich samych podstawach: \\( \\log_a x - \\log_a y = \\log_a \\left(\\frac{x}{y}\\right) \\):\n\n" +
-                          "\\[ \\log_3 36 - \\log_3 4 = \\log_3 \\left(\\frac{36}{4}\\right) = \\log_3 9 = 2 \\]\n\n" +
-                          "Prawidłowa odpowiedź to **A**."
-            },
+    <!-- SEKCJA 3: GENERATOR ARKUSZA -->
+    <div id="view-exam" class="hidden">
+      <h1 class="section-title">Tryb Egzaminacyjny</h1>
+      <p style="color: var(--text-muted); margin-bottom: 20px;">Wygeneruj losowy zestaw zadań zgodny ze standardami CKE.</p>
+      
+      <div class="task-card">
+        <h3>Skonfiguruj Twój Arkusz</h3>
+        <br>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+          <label>
+            Poziom:
+            <select id="exam-level" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);">
+              <option value="podstawa">Podstawowy</option>
+              <option value="rozszerzenie">Rozszerzony</option>
+            </select>
+          </label>
+          <label>
+            Liczba zadań:
+            <input type="number" id="exam-count" value="10" min="5" max="30" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); width: 80px;">
+          </label>
+        </div>
+        <button class="nav-btn active" onclick="generateExam()">Rozpocznij Arkusz</button>
+      </div>
 
-            // RÓWNANIA I NIERÓWNOŚCI
-            {
-                id: "p3",
-                level: "Podstawowy",
-                topic: "Równania i nierówności",
-                type: "otwarte",
-                points: 2,
-                question: "Rozwiąż nierówność kwadratową: \\( x^2 - 5x + 6 \\le 0 \\).",
-                solution: "**Krok 1: Wyznaczamy pierwiastki równania \\( x^2 - 5x + 6 = 0 \\):**\n" +
-                          "\\[ \\Delta = (-5)^2 - 4 \\cdot 1 \\cdot 6 = 25 - 24 = 1 \\]\n" +
-                          "\\[ \\sqrt{\\Delta} = 1 \\]\n" +
-                          "\\[ x_1 = \\frac{5 - 1}{2} = 2, \\quad x_2 = \\frac{5 + 1}{2} = 3 \\]\n\n" +
-                          "**Krok 2: Odczytujemy przedział:**\n" +
-                          "Ramiona paraboli skierowane są w górę (gdyż \\( a=1 > 0 \\)). Wartości mniejsze lub równe zeru leżą między pierwiastkami.\n\n" +
-                          "**Odpowiedź:** \\( x \\in [2, 3] \\).",
-                markingScheme: "• **1 pkt** – poprawne obliczenie pierwiastków \\(x_1 = 2\\), \\(x_2 = 3\\).\n• **2 pkt** – podanie poprawnego przedziału domkniętego \\(x \\in [2, 3]\\)."
-            },
-            {
-                id: "p4",
-                level: "Podstawowy",
-                topic: "Równania i nierówności",
-                type: "zamknięte",
-                points: 1,
-                question: "Równanie \\( \\frac{(x-2)(x+3)}{x^2 - 4} = 0 \\) w zbiorze liczb rzeczywistych:",
-                options: [
-                    "ma dokładnie dwa rozwiązania: \\( x = 2 \\) oraz \\( x = -3 \\)",
-                    "ma dokładnie jedno rozwiązanie: \\( x = -3 \\)",
-                    "ma dokładnie jedno rozwiązanie: \\( x = 2 \\)",
-                    "nie ma rozwiązań"
-                ],
-                correctOption: 1,
-                solution: "**Krok 1: Dziedzina równania (mianownik nie może być zerem):**\n" +
-                          "\\( x^2 - 4 \\neq 0 \\implies (x-2)(x+2) \\neq 0 \\implies x \\neq 2 \\) oraz \\( x \\neq -2 \\).\n\n" +
-                          "**Krok 2: Przyrównanie licznika do zera:**\n" +
-                          "\\( (x-2)(x+3) = 0 \\implies x = 2 \\) lub \\( x = -3 \\).\n\n" +
-                          "Ponieważ \\( x=2 \\) nie należy do dziedziny, jedynym rozwiązaniem jest \\( x = -3 \\).\n" +
-                          "Prawidłowa odpowiedź to **B**."
-            },
+      <div id="exam-container" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+          <h2>Twój Egzamin</h2>
+          <div id="exam-timer" style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">00:00:00</div>
+        </div>
+        <div id="exam-tasks"></div>
+      </div>
+    </div>
 
-            // FUNKCJE
-            {
-                id: "p5",
-                level: "Podstawowy",
-                topic: "Funkcje",
-                type: "zamknięte",
-                points: 1,
-                question: "Proste o równaniach \\( y = (2m - 1)x + 3 \\) oraz \\( y = (m + 4)x - 2 \\) są równoległe dla m równego:",
-                options: [
-                    "\\( m = 5 \\)",
-                    "\\( m = -3 \\)",
-                    "\\( m = 1 \\)",
-                    "\\( m = -5 \\)"
-                ],
-                correctOption: 0,
-                solution: "Proste są równoległe, gdy ich współczynniki kierunkowe są równe:\n" +
-                          "\\[ 2m - 1 = m + 4 \\]\n" +
-                          "\\[ 2m - m = 4 + 1 \\implies m = 5 \\]\n\n" +
-                          "Prawidłowa odpowiedź to **A**."
-            },
+    <!-- SEKCJA 4: STATYSTYKI -->
+    <div id="view-stats" class="hidden">
+      <h1 class="section-title">Twoje Postępy</h1>
+      <div class="task-card">
+        <h3>Podsumowanie wyników</h3>
+        <br>
+        <p>Rozwiązane zadania: <strong id="stat-total">0</strong></p>
+        <p>Poprawne odpowiedzi: <strong id="stat-correct" style="color: var(--success);">0</strong></p>
+        <p>Ogólna skuteczność: <strong id="stat-percent">0%</strong></p>
+        <br>
+        <button class="nav-btn" style="color: var(--danger); border-color: var(--danger);" onclick="resetStats()">Wyczyść statystyki</button>
+      </div>
+    </div>
 
-            // CIĄGI
-            {
-                id: "p6",
-                level: "Podstawowy",
-                topic: "Ciągi",
-                type: "otwarte",
-                points: 2,
-                question: "Dany jest ciąg arytmetyczny \\( (a_n) \\), w którym \\( a_1 = 3 \\) oraz \\( a_4 = 15 \\). Oblicz sumę dziesięciu pierwszych wyrazów tego ciągu.",
-                solution: "**Krok 1: Wyznaczamy różnicę ciągu \\(r\\):**\n" +
-                          "\\( a_4 = a_1 + 3r \\implies 15 = 3 + 3r \\implies 3r = 12 \\implies r = 4 \\).\n\n" +
-                          "**Krok 2: Obliczamy dziesiąty wyraz \\(a_{10}\\):**\n" +
-                          "\\( a_{10} = a_1 + 9r = 3 + 9 \\cdot 4 = 3 + 36 = 39 \\).\n\n" +
-                          "**Krok 3: Obliczamy sumę \\(S_{10}\\):**\n" +
-                          "\\[ S_{10} = \\frac{a_1 + a_{10}}{2} \\cdot 10 = \\frac{3 + 39}{2} \\cdot 10 = 21 \\cdot 10 = 210 \\]\n\n" +
-                          "**Odpowiedź:** Suma wynosi 210.",
-                markingScheme: "• **1 pkt** – obliczenie różnicy ciągu \\(r = 4\\).\n• **2 pkt** – rzetelne obliczenie sumy \\(S_{10} = 210\\)."
-            },
+  </div>
 
-            // GEOMETRIA & PLANIMETRIA
-            {
-                id: "p7",
-                level: "Podstawowy",
-                topic: "Planimetria",
-                type: "zamknięte",
-                points: 1,
-                question: "W trójkącie prostokątnym jedna z przyprostokątnych ma długość 6, a przeciwprostokątna ma długość 10. Tangens najmniejszego kąta w tym trójkącie jest równy:",
-                options: [
-                    "\\( \\frac{3}{4} \\)",
-                    "\\( \\frac{4}{3} \\)",
-                    "\\( \\frac{3}{5} \\)",
-                    "\\( \\frac{4}{5} \\)"
-                ],
-                correctOption: 0,
-                solution: "**Krok 1: Druga przyprostokątna z twierdzenia Pitagorasa:**\n" +
-                          "\\( a^2 + 6^2 = 10^2 \\implies a^2 + 36 = 100 \\implies a^2 = 64 \\implies a = 8 \\).\n\n" +
-                          "**Krok 2: Najmniejszy kąt leży naprzeciw najkrótszego boku (czyli boku o długości 6):**\n" +
-                          "\\[ \\tan \\alpha = \\frac{\\text{przyprostokątna przeciwległa}}{\\text{przyprostokątna przyległa}} = \\frac{6}{8} = \\frac{3}{4} \\]\n\n" +
-                          "Prawidłowa odpowiedź to **A**."
-            },
+  <!-- Rysownica / Brudnopis -->
+  <div id="scratchpad">
+    <div class="scratch-header">
+      <span>Brudnopis / Rydownik</span>
+      <button onclick="toggleScratchpad()" style="background: none; border: none; color: white; cursor: pointer;">✕</button>
+    </div>
+    <canvas id="canvas" width="350" height="300"></canvas>
+    <div class="scratch-tools">
+      <button class="nav-btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="clearCanvas()">Wyczyść</button>
+      <input type="color" id="brush-color" value="#000000">
+    </div>
+  </div>
 
-            // ROZSZERZONE - POCHODNA I OPTYMALIZACJA
-            {
-                id: "r1",
-                level: "Rozszerzony",
-                topic: "Optymalizacja i pochodne",
-                type: "otwarte",
-                points: 4,
-                question: "Wyznacz największą wartość funkcji \\( f(x) = -x^3 + 3x^2 + 9x - 5 \\) w przedziale domkniętym \\([-2, 4]\\).",
-                solution: "**Krok 1: Obliczamy pochodną funkcji:**\n" +
-                          "\\[ f'(x) = -3x^2 + 6x + 9 \\]\n\n" +
-                          "**Krok 2: Wyznaczamy punkty stacjonarne (miejsca zerowe pochodnej):**\n" +
-                          "\\[ -3x^2 + 6x + 9 = 0 \\implies x^2 - 2x - 3 = 0 \\]\n" +
-                          "\\[ (x-3)(x+1) = 0 \\implies x_1 = -1, \\quad x_2 = 3 \\]\n" +
-                          "Oba punkty leżą w rozpatrywanym przedziale \\([-2, 4]\\).\n\n" +
-                          "**Krok 3: Obliczamy wartości funkcji w punktach stacjonarnych i na końcach przedziału:**\n" +
-                          "• \\( f(-2) = -(-8) + 3(4) + 9(-2) - 5 = 8 + 12 - 18 - 5 = -3 \\)\n" +
-                          "• \\( f(-1) = -(-1) + 3(1) + 9(-1) - 5 = 1 + 3 - 9 - 5 = -10 \\)\n" +
-                          "• \\( f(3) = -(27) + 3(9) + 9(3) - 5 = -27 + 27 + 27 - 5 = 22 \\)\n" +
-                          "• \\( f(4) = -(64) + 3(16) + 9(4) - 5 = -64 + 48 + 36 - 5 = 15 \\)\n\n" +
-                          "**Konkluzja:** Największa wartość funkcji w przedziale wynosi **22** (dla \\(x=3\\)).",
-                markingScheme: "• **1 pkt** – poprawne wyznaczenie pochodnej \\(f'(x) = -3x^2+6x+9\\).\n• **2 pkt** – wyznaczenie miejsc zerowych pochodnej \\(x=-1, x=3\\).\n• **3 pkt** – obliczenie wartości we wszystkich kluczowych punktach.\n• **4 pkt** – podanie poprawnej odpowiedzi końcowej (22)."
-            },
+  <script>
+    // Działy maturalne
+    const dzialy = [
+      { name: "Planimetria", icon: "🔷", hasRozszerzenie: true },
+      { name: "Geometria analityczna", icon: "📍", hasRozszerzenie: true },
+      { name: "Równania i nierówności", icon: "⚖️", hasRozszerzenie: true },
+      { name: "Ciągi", icon: "🔄", hasRozszerzenie: true },
+      { name: "Stereometria", icon: "🧊", hasRozszerzenie: true },
+      { name: "Trygonometria", icon: "📐", hasRozszerzenie: true },
+      { name: "Potęgi i pierwiastki", icon: "🌱", hasRozszerzenie: true },
+      { name: "Prawdopodobieństwo", icon: "🎯", hasRozszerzenie: true },
+      { name: "Funkcja kwadratowa", icon: "🏔️", hasRozszerzenie: true },
+      { name: "Funkcje", icon: "📈", hasRozszerzenie: true },
+      { name: "Logarytmy", icon: "🐚", hasRozszerzenie: true },
+      { name: "Wyrażenia algebraiczne", icon: "🧮", hasRozszerzenie: true },
+      { name: "Liczby rzeczywiste", icon: "🔢", hasRozszerzenie: true },
+      { name: "Funkcja liniowa", icon: "✏️", hasRozszerzenie: false },
+      { name: "Procenty", icon: "💯", hasRozszerzenie: false },
+      { name: "Statystyka", icon: "📊", hasRozszerzenie: false },
+      { name: "Kombinatoryka", icon: "🎲", hasRozszerzenie: true },
+      { name: "Rachunek różniczkowy", icon: "♾️", isRozszerzenieOnly: true },
+      { name: "Równania z parametrem", icon: "🔣", isRozszerzenieOnly: true },
+      { name: "Układy równań", icon: "🔗", hasRozszerzenie: false },
+      { name: "Wartość bezwzględna", icon: "💎", isRozszerzenieOnly: true },
+      { name: "Wielomiany", icon: "🧩", hasRozszerzenie: true },
+      { name: "Funkcja wykładnicza", icon: "🚀", hasRozszerzenie: true },
+      { name: "Optymalizacja", icon: "⚙️", hasRozszerzenie: true },
+      { name: "Inne", icon: "📝", hasRozszerzenie: false }
+    ];
 
-            // ROZSZERZONE - TRIGONOMETRIA
-            {
-                id: "r2",
-                level: "Rozszerzony",
-                topic: "Trigonometria",
-                type: "otwarte",
-                points: 3,
-                question: "Rozwiąż równanie trigonocentryczne: \\( 2\\sin^2 x + \\cos x - 1 = 0 \\) dla \\( x \\in [0, 2\\pi] \\).",
-                solution: "**Krok 1: Zamiana \\(\\sin^2 x\\) z jedynki trygonometrycznej:**\n" +
-                          "\\( 2(1 - \\cos^2 x) + \\cos x - 1 = 0 \\implies 2 - 2\\cos^2 x + \\cos x - 1 = 0 \\)\n" +
-                          "\\[ -2\\cos^2 x + \\cos x + 1 = 0 \\]\n\n" +
-                          "**Krok 2: Podstawienie zmiennej pomocniczej \\(t = \\cos x\\), gdzie \\(t \\in [-1, 1]\\):**\n" +
-                          "\\( -2t^2 + t + 1 = 0 \\implies 2t^2 - t - 1 = 0 \\)\n" +
-                          "\\( \\Delta = 1 - 4(2)(-1) = 9 \\implies \\sqrt{\\Delta} = 3 \\)\n" +
-                          "\\( t_1 = \\frac{1 - 3}{4} = -\\frac{1}{2}, \\quad t_2 = \\frac{1 + 3}{4} = 1 \\).\n\n" +
-                          "**Krok 3: Powrót do zmiennej \\(x\\) w przedziale \\([0, 2\\pi]\\):**\n" +
-                          "1) \\( \\cos x = 1 \\implies x = 0 \\) lub \\( x = 2\\pi \\)\n" +
-                          "2) \\( \\cos x = -\\frac{1}{2} \\implies x = \\frac{2\\pi}{3} \\) lub \\( x = \\frac{4\\pi}{3} \\)\n\n" +
-                          "**Zbiór rozwiązań:** \\( x \\in \\left\\{ 0, \\frac{2\\pi}{3}, \\frac{4\\pi}{3}, 2\\pi \\right\\} \\).",
-                markingScheme: "• **1 pkt** – sprowadzenie do równania z jedną funkcją kwasu \\(\\cos x\\).\n• **2 pkt** – wyznaczenie wartości \\(t = 1\\) oraz \\(t = -1/2\\).\n• **3 pkt** – podanie pełnego zbioru rozwiązań w przedziale."
-            },
+    // Domyślna baza zadań
+    let bazaZadan = [
+      {
+        id: 1,
+        dzial: "Logarytmy",
+        poziom: "podstawa",
+        typ: "zamkniete",
+        tresc: "Liczba $\\log_2 16 + \\log_3 9$ jest równa:",
+        odpowiedzi: ["4", "6", "2", "8"],
+        poprawna: 1,
+        wyjasnienie: "$\\log_2 16 = 4$ ponieważ $2^4=16$. \\n$\\log_3 9 = 2$ ponieważ $3^2=9$. \\nStąd $4 + 2 = 6$."
+      },
+      {
+        id: 2,
+        dzial: "Równania i nierówności",
+        poziom: "podstawa",
+        typ: "zamkniete",
+        tresc: "Rozwiązaniem równania $\\frac{x-2}{3} = 4$ jest liczba:",
+        odpowiedzi: ["10", "14", "12", "8"],
+        poprawna: 1,
+        wyjasnienie: "Mnożymy obustronnie przez 3: $x - 2 = 12$, stąd $x = 14$."
+      },
+      {
+        id: 3,
+        dzial: "Rachunek różniczkowy",
+        poziom: "rozszerzenie",
+        typ: "otwarte",
+        punkty: 3,
+        tresc: "Oblicz pochodną funkcji $f(x) = x^3 - 4x^2 + 7x - 1$ w punkcie $x_0 = 2$.",
+        odpowiedzi: [],
+        poprawna: null,
+        wyjasnienie: "1. Liczymy pochodną: $f'(x) = 3x^2 - 8x + 7$. \\n2. Podstawiamy $x_0 = 2$: $f'(2) = 3(2)^2 - 8(2) + 7 = 12 - 16 + 7 = 3$."
+      }
+    ];
 
-            // ROZSZERZONE - GEOMETRIA ANALITYCZNA
-            {
-                id: "r3",
-                level: "Rozszerzony",
-                topic: "Geometria analityczna",
-                type: "zamknięte",
-                points: 1,
-                question: "Odległość punktu \\( P = (2, -3) \\) od prostej o równaniu \\( 3x - 4y + 2 = 0 \\) wynosi:",
-                options: [
-                    "\\( 4 \\)",
-                    "\\( 2 \\)",
-                    "\\( 5 \\)",
-                    "\\( \\frac{18}{5} \\)"
-                ],
-                correctOption: 0,
-                solution: "Stosujemy wzór na odległość punktu \\((x_0, y_0)\\) od prostej \\(Ax + By + C = 0\\):\n" +
-                          "\\[ d = \\frac{|A x_0 + B y_0 + C|}{\\sqrt{A^2 + B^2}} \\]\n\n" +
-                          "Podstawiamy dane \\(A=3, B=-4, C=2\\) oraz \\(x_0=2, y_0=-3\\):\n" +
-                          "\\[ d = \\frac{|3(2) + (-4)(-3) + 2|}{\\sqrt{3^2 + (-4)^2}} = \\frac{|6 + 12 + 2|}{\\sqrt{9 + 16}} = \\frac{20}{\\sqrt{25}} = \\frac{20}{5} = 4 \\]\n\n" +
-                          "Prawidłowa odpowiedź to **A**."
-            }
-        ];
+    // Stan aplikacji (zapisywany w localStorage)
+    let userStats = JSON.parse(localStorage.getItem('sm_stats')) || { solved: {}, correct: 0, total: 0 };
 
-        // =========================================================================
-        // 2. STATE MANAGEMENT & LOCAL STORAGE
-        // =========================================================================
-        let state = {
-            userAnswers: {},  // { taskId: { answer: optIndex/score, isCorrect: bool, openUserScore: num } }
-            savedTaskIds: [], // ['p1', 'r2']
-            currentTab: 'dashboard',
-            examState: null   // { tasks: [], startTime: timestamp, timerInterval: id }
-        };
+    function saveStats() {
+      localStorage.setItem('sm_stats', JSON.stringify(userStats));
+    }
 
-        function loadState() {
-            const saved = localStorage.getItem('sprawna_matura_state');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    state.userAnswers = parsed.userAnswers || {};
-                    state.savedTaskIds = parsed.savedTaskIds || [];
-                } catch(e) { console.error("Błąd ładowania stanu", e); }
-            }
-            updateSavedBadge();
+    // Ładowanie kafelków
+    function renderCategories() {
+      const container = document.getElementById('categories-list');
+      container.innerHTML = '';
+
+      dzialy.forEach(d => {
+        const countAll = bazaZadan.filter(z => z.dzial === d.name).length;
+        const countRozsz = bazaZadan.filter(z => z.dzial === d.name && z.poziom === 'rozszerzenie').length;
+
+        const card = document.createElement('div');
+        card.className = 'category-card';
+        card.onclick = () => openCategory(d.name);
+
+        let rozszBadge = d.isRozszerzenieOnly ? `<span class="badge-rozsz">Tylko Rozszerzenie</span>` : 
+                         (d.hasRozszerzenie ? `<span class="badge-rozsz">+${countRozsz} rozszerzenie</span>` : '');
+
+        card.innerHTML = `
+          <div class="cat-header">
+            <span class="cat-icon">${d.icon}</span>
+            <span class="cat-title">${d.name}</span>
+            ${rozszBadge}
+          </div>
+          <div class="cat-stats">${countAll} zadań w bazie</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Otwarcie konkretnego działu
+    function openCategory(dzialName) {
+      document.getElementById('view-learn').classList.add('hidden');
+      document.getElementById('view-tasks').classList.remove('hidden');
+      document.getElementById('current-category-title').innerText = dzialName;
+
+      const tasks = bazaZadan.filter(z => z.dzial === dzialName);
+      const container = document.getElementById('tasks-container');
+      container.innerHTML = '';
+
+      if (tasks.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted);">Brak zadań w tym dziale. Importuj bazę JSON z zadaniami!</p>`;
+        return;
+      }
+
+      tasks.forEach(t => {
+        container.appendChild(createTaskElement(t));
+      });
+
+      if (window.MathJax) MathJax.typesetPromise();
+    }
+
+    // Tworzenie elementu zadania
+    function createTaskElement(t) {
+      const card = document.createElement('div');
+      card.className = 'task-card';
+
+      const badgeClass = t.poziom === 'rozszerzenie' ? 'badge-rozszerzenie' : 'badge-podstawa';
+
+      let optionsHTML = '';
+      if (t.typ === 'zamkniete') {
+        optionsHTML = `<div class="options-grid">` + 
+          t.odpowiedzi.map((opt, i) => `
+            <button class="option-btn" onclick="checkAnswer(${t.id}, ${i}, this)">
+              <strong>${String.fromCharCode(65 + i)}.</strong> ${opt}
+            </button>
+          `).join('') + `</div>`;
+      } else {
+        optionsHTML = `
+          <div class="open-task-actions">
+            <button class="btn-action btn-show" onclick="toggleExplanation(${t.id})">Pokaż Rozwiązanie CKE</button>
+            <button class="btn-action btn-correct" onclick="markOpenTask(${t.id}, true)">Rozwiązano Poprawnie</button>
+            <button class="btn-action btn-wrong" onclick="markOpenTask(${t.id}, false)">Błąd</button>
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="task-meta">
+          <span class="task-badge ${badgeClass}">${t.poziom}</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Zadanie #${t.id}</span>
+        </div>
+        <div class="task-content">${t.tresc}</div>
+        ${optionsHTML}
+        <div class="explanation-box" id="exp-${t.id}">
+          <strong>Wyjaśnienie / Krok po kroku:</strong><br>
+          ${t.wyjasnienie}
+        </div>
+      `;
+      return card;
+    }
+
+    // Sprawdzanie odpowiedzi zamkniętej
+    function checkAnswer(taskId, selectedIdx, btn) {
+      const task = bazaZadan.find(z => z.id === taskId);
+      const parent = btn.parentElement;
+      const buttons = parent.querySelectorAll('.option-btn');
+
+      buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === task.poprawna) b.classList.add('correct');
+        if (i === selectedIdx && i !== task.poprawna) b.classList.add('wrong');
+      });
+
+      document.getElementById(`exp-${taskId}`).classList.add('visible');
+
+      if (!userStats.solved[taskId]) {
+        userStats.total++;
+        if (selectedIdx === task.poprawna) userStats.correct++;
+        userStats.solved[taskId] = true;
+        saveStats();
+      }
+    }
+
+    function toggleExplanation(taskId) {
+      document.getElementById(`exp-${taskId}`).classList.toggle('visible');
+    }
+
+    function markOpenTask(taskId, isCorrect) {
+      if (!userStats.solved[taskId]) {
+        userStats.total++;
+        if (isCorrect) userStats.correct++;
+        userStats.solved[taskId] = true;
+        saveStats();
+        alert("Zapisano wynik!");
+      }
+    }
+
+    // Przełączanie Zakładek
+    function switchTab(tab) {
+      document.getElementById('view-learn').classList.add('hidden');
+      document.getElementById('view-tasks').classList.add('hidden');
+      document.getElementById('view-exam').classList.add('hidden');
+      document.getElementById('view-stats').classList.add('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+      if (tab === 'learn') {
+        document.getElementById('view-learn').classList.remove('hidden');
+        document.getElementById('btn-learn').classList.add('active');
+      } else if (tab === 'exam') {
+        document.getElementById('view-exam').classList.remove('hidden');
+        document.getElementById('btn-exam').classList.add('active');
+      } else if (tab === 'stats') {
+        document.getElementById('view-stats').classList.remove('hidden');
+        document.getElementById('btn-stats').classList.add('active');
+        updateStatsView();
+      }
+    }
+
+    function updateStatsView() {
+      document.getElementById('stat-total').innerText = userStats.total;
+      document.getElementById('stat-correct').innerText = userStats.correct;
+      const pct = userStats.total > 0 ? Math.round((userStats.correct / userStats.total) * 100) : 0;
+      document.getElementById('stat-percent').innerText = `${pct}%`;
+    }
+
+    function resetStats() {
+      if (confirm("Czy na pewno chcesz zresetować swoje statystyki?")) {
+        userStats = { solved: {}, correct: 0, total: 0 };
+        saveStats();
+        updateStatsView();
+      }
+    }
+
+    // Import zewnętrznej bazy danych JSON
+    function importDatabase(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (Array.isArray(importedData)) {
+            bazaZadan = importedData;
+            alert(`Pomyślnie zaimportowano ${bazaZadan.length} zadań!`);
+            renderCategories();
+          }
+        } catch (err) {
+          alert("Błąd podczas odczytu pliku JSON. Upewnij się, że plik ma poprawną strukturę.");
         }
-
-        function saveState() {
-            localStorage.setItem('sprawna_matura_state', JSON.stringify({
-                userAnswers: state.userAnswers,
-                savedTaskIds: state.savedTaskIds
-            }));
-            updateSavedBadge();
-            renderDashboardStats();
-        }
-
-        function updateSavedBadge() {
-            document.getElementById('saved-count').innerText = state.savedTaskIds.length;
-        }
-
-        function toggleSaveTask(taskId) {
-            const index = state.savedTaskIds.indexOf(taskId);
-            if (index > -1) {
-                state.savedTaskIds.splice(index, 1);
-            } else {
-                state.savedTaskIds.push(taskId);
-            }
-            saveState();
-            // Refresh views if open
-            if (state.currentTab === 'study') renderStudyTasks();
-            if (state.currentTab === 'saved') renderSavedTasks();
-        }
-
-        // =========================================================================
-        // 3. TAB NAVIGATION
-        // =========================================================================
-        function switchTab(tabId) {
-            state.currentTab = tabId;
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-
-            // Nav link styles
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-brand-600', 'dark:text-brand-400', 'bg-brand-50', 'dark:bg-brand-900/30');
-                btn.classList.add('text-slate-600', 'dark:text-slate-300');
-            });
-            const activeNav = document.getElementById(`nav-${tabId}`);
-            if (activeNav) {
-                activeNav.classList.add('text-brand-600', 'dark:text-brand-400', 'bg-brand-50', 'dark:bg-brand-900/30');
-            }
-
-            if (tabId === 'dashboard') renderDashboard();
-            if (tabId === 'study') renderStudyTasks();
-            if (tabId === 'saved') renderSavedTasks();
-
-            // Re-render Math formulas
-            setTimeout(() => { if (window.renderMathInElement) renderMathInElement(document.body); }, 50);
-        }
-
-        // =========================================================================
-        // 4. DASHBOARD RENDER
-        // =========================================================================
-        let currentTopicLevelFilter = 'all';
-
-        function filterLevel(level) {
-            currentTopicLevelFilter = level;
-            ['all', 'podstawa', 'rozszerzenie'].forEach(l => {
-                const btn = document.getElementById(`btn-lvl-${l}`);
-                if (l === level) {
-                    btn.className = "px-3 py-1 text-xs rounded-lg font-medium bg-slate-800 text-white dark:bg-slate-200 dark:text-slate-900";
-                } else {
-                    btn.className = "px-3 py-1 text-xs rounded-lg font-medium bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300";
-                }
-            });
-            renderTopicsGrid();
-        }
-
-        function renderDashboard() {
-            renderDashboardStats();
-            renderTopicsGrid();
-            populateTopicDropdowns();
-        }
-
-        function renderDashboardStats() {
-            const solvedKeys = Object.keys(state.userAnswers);
-            const totalSolved = solvedKeys.length;
-            
-            let correctCount = 0;
-            let podstawaSolved = 0, podstawaTotal = 0;
-            let rozszerzenieSolved = 0, rozszerzenieTotal = 0;
-
-            TASKS_DB.forEach(task => {
-                if (task.level === 'Podstawowy') podstawaTotal++;
-                if (task.level === 'Rozszerzony') rozszerzenieTotal++;
-
-                if (state.userAnswers[task.id]) {
-                    if (state.userAnswers[task.id].isCorrect) correctCount++;
-                    if (task.level === 'Podstawowy') podstawaSolved++;
-                    if (task.level === 'Rozszerzony') rozszerzenieSolved++;
-                }
-            });
-
-            const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
-
-            document.getElementById('stat-total-solved').innerText = `${totalSolved} / ${TASKS_DB.length}`;
-            document.getElementById('stat-accuracy').innerText = `${accuracy}%`;
-            document.getElementById('stat-podstawa').innerText = `${podstawaSolved} / ${podstawaTotal}`;
-            document.getElementById('stat-rozszerzenie').innerText = `${rozszerzenieSolved} / ${rozszerzenieTotal}`;
-        }
-
-        function renderTopicsGrid() {
-            const topicsMap = {};
-
-            TASKS_DB.forEach(task => {
-                if (currentTopicLevelFilter === 'podstawa' && task.level !== 'Podstawowy') return;
-                if (currentTopicLevelFilter === 'rozszerzenie' && task.level !== 'Rozszerzony') return;
-
-                if (!topicsMap[task.topic]) {
-                    topicsMap[task.topic] = { total: 0, solved: 0, correct: 0, levels: new Set() };
-                }
-                topicsMap[task.topic].total++;
-                topicsMap[task.topic].levels.add(task.level);
-
-                if (state.userAnswers[task.id]) {
-                    topicsMap[task.topic].solved++;
-                    if (state.userAnswers[task.id].isCorrect) topicsMap[task.topic].correct++;
-                }
-            });
-
-            const grid = document.getElementById('topics-grid');
-            grid.innerHTML = '';
-
-            Object.keys(topicsMap).forEach(topicName => {
-                const data = topicsMap[topicName];
-                const pct = data.solved > 0 ? Math.round((data.correct / data.solved) * 100) : 0;
-
-                const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:border-brand-500/50 transition cursor-pointer flex flex-col justify-between";
-                card.onclick = () => {
-                    document.getElementById('filter-study-topic').value = topicName;
-                    switchTab('study');
-                };
-
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                                ${Array.from(data.levels).join(', ')}
-                            </span>
-                            <span class="text-xs font-bold ${pct >= 70 ? 'text-brand-600' : 'text-slate-500'}">${data.solved > 0 ? pct + '% celności' : 'Nie rozpoczęto'}</span>
-                        </div>
-                        <h4 class="font-bold text-base text-slate-800 dark:text-slate-100 mb-1">${topicName}</h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Zadań w bazie: ${data.total}</p>
-                    </div>
-
-                    <div class="mt-4">
-                        <div class="flex justify-between text-xs text-slate-500 mb-1">
-                            <span>Postęp</span>
-                            <span>${data.solved}/${data.total}</span>
-                        </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
-                            <div class="bg-brand-500 h-full rounded-full transition-all duration-300" style="width: ${(data.solved / data.total) * 100}%"></div>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function populateTopicDropdowns() {
-            const select = document.getElementById('filter-study-topic');
-            const currentVal = select.value;
-            select.innerHTML = '<option value="all">Wszystkie Działy</option>';
-
-            const topics = [...new Set(TASKS_DB.map(t => t.topic))];
-            topics.forEach(t => {
-                const opt = document.createElement('option');
-                opt.value = t;
-                opt.innerText = t;
-                select.appendChild(opt);
-            });
-            select.value = currentVal;
-        }
-
-        // =========================================================================
-        // 5. TASK CARD COMPONENT GENERATOR
-        // =========================================================================
-        function createTaskCardHtml(task, indexNumber = null) {
-            const isSaved = state.savedTaskIds.includes(task.id);
-            const userAns = state.userAnswers[task.id];
-
-            let headerLevelBadge = task.level === 'Podstawowy' 
-                ? '<span class="px-2.5 py-0.5 text-xs font-semibold rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">Poziom Podstawowy</span>'
-                : '<span class="px-2.5 py-0.5 text-xs font-semibold rounded-md bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300">Poziom Rozszerzony</span>';
-
-            let optionsHtml = '';
-
-            if (task.type === 'zamknięte') {
-                optionsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 my-4">`;
-                const labels = ['A', 'B', 'C', 'D'];
-
-                task.options.forEach((opt, idx) => {
-                    let btnStyle = "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-800 dark:text-slate-200";
-
-                    if (userAns) {
-                        if (idx === task.correctOption) {
-                            btnStyle = "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-200 font-semibold";
-                        } else if (userAns.answer === idx && idx !== task.correctOption) {
-                            btnStyle = "border-red-500 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200";
-                        }
-                    }
-
-                    optionsHtml += `
-                        <button onclick="submitClosedAnswer('${task.id}', ${idx})" 
-                                ${userAns ? 'disabled' : ''} 
-                                class="p-3 text-left border rounded-xl transition flex items-start gap-3 ${btnStyle}">
-                            <span class="w-6 h-6 rounded-lg bg-slate-200 dark:bg-slate-700 text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">${labels[idx]}</span>
-                            <span class="text-sm my-auto">${opt}</span>
-                        </button>
-                    `;
-                });
-                optionsHtml += `</div>`;
-            } else {
-                // Task Otwarte
-                optionsHtml = `
-                    <div class="my-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-xs font-semibold text-slate-500"><i class="fa-solid fa-pen-clip mr-1"></i> Zadanie Otwarte (${task.points} pkt)</span>
-                            <button onclick="toggleSolution('${task.id}')" class="text-xs text-brand-600 dark:text-brand-400 font-semibold hover:underline">
-                                <i class="fa-solid fa-eye mr-1"></i> Pokaż Modelowe Rozwiązanie
-                            </button>
-                        </div>
-
-                        ${userAns ? `
-                            <div class="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300">
-                                <i class="fa-solid fa-circle-check mr-1"></i> Przyznano punkty: <strong>${userAns.openUserScore} / ${task.points} pkt</strong>
-                            </div>
-                        ` : `
-                            <div class="text-xs text-slate-500 mb-2">Rozwiąż zadanie w brudnopisie lub na kartce, a następnie sprawdź rozwiązanie i przyznaj sobie punkty:</div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-xs font-medium mr-1">Twoja punktacja:</span>
-                                ${Array.from({length: task.points + 1}, (_, i) => i).map(pts => `
-                                    <button onclick="submitOpenAnswer('${task.id}', ${pts})" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-xs font-semibold hover:bg-brand-500 hover:text-white transition">
-                                        ${pts} pkt
-                                    </button>
-                                `).join('')}
-                            </div>
-                        `}
-                    </div>
-                `;
-            }
-
-            return `
-                <div id="task-card-${task.id}" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 sm:p-6 transition">
-                    <div class="flex justify-between items-start gap-4 mb-3 border-b border-slate-100 dark:border-slate-700/60 pb-3">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            ${indexNumber ? `<span class="font-extrabold text-brand-600 dark:text-brand-400">Zadanie ${indexNumber}.</span>` : ''}
-                            ${headerLevelBadge}
-                            <span class="text-xs px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium">${task.topic}</span>
-                        </div>
-                        <button onclick="toggleSaveTask('${task.id}')" title="Zapisz do powtórek" class="text-slate-400 hover:text-amber-500 transition">
-                            <i class="${isSaved ? 'fa-solid text-amber-500' : 'fa-regular'} fa-bookmark text-lg"></i>
-                        </button>
-                    </div>
-
-                    <!-- Question Content -->
-                    <div class="text-sm sm:text-base text-slate-800 dark:text-slate-100 leading-relaxed font-medium">
-                        ${task.question}
-                    </div>
-
-                    <!-- Options / Input -->
-                    ${optionsHtml}
-
-                    <!-- Solution Breakdown Collapsible -->
-                    <div id="solution-${task.id}" class="${userAns ? '' : 'hidden'} mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <div class="flex items-center gap-2 text-brand-600 dark:text-brand-400 font-bold text-xs uppercase tracking-wider mb-2">
-                            <i class="fa-solid fa-lightbulb"></i> Pełne Rozwiązanie Krok po Kroku
-                        </div>
-                        <div class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">
-                            ${task.solution}
-                        </div>
-                        ${task.markingScheme ? `
-                            <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500">
-                                <span class="font-bold text-slate-700 dark:text-slate-300 block mb-1">Schemat oceniania CKE:</span>
-                                ${task.markingScheme}
-                            </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        // =========================================================================
-        // 6. ANSWERS LOGIC
-        // =========================================================================
-        function submitClosedAnswer(taskId, optionIndex) {
-            const task = TASKS_DB.find(t => t.id === taskId);
-            if (!task) return;
-
-            const isCorrect = (optionIndex === task.correctOption);
-            state.userAnswers[taskId] = {
-                answer: optionIndex,
-                isCorrect: isCorrect
-            };
-
-            saveState();
-            refreshTaskCard(taskId);
-        }
-
-        function submitOpenAnswer(taskId, pointsGiven) {
-            const task = TASKS_DB.find(t => t.id === taskId);
-            if (!task) return;
-
-            const isCorrect = (pointsGiven === task.points);
-            state.userAnswers[taskId] = {
-                answer: pointsGiven,
-                openUserScore: pointsGiven,
-                isCorrect: isCorrect
-            };
-
-            saveState();
-            refreshTaskCard(taskId);
-        }
-
-        function toggleSolution(taskId) {
-            const el = document.getElementById(`solution-${taskId}`);
-            if (el) el.classList.toggle('hidden');
-        }
-
-        function refreshTaskCard(taskId) {
-            const task = TASKS_DB.find(t => t.id === taskId);
-            const cardEl = document.getElementById(`task-card-${taskId}`);
-            if (task && cardEl) {
-                cardEl.outerHTML = createTaskCardHtml(task);
-                setTimeout(() => { if (window.renderMathInElement) renderMathInElement(document.body); }, 50);
-            }
-        }
-
-        // =========================================================================
-        // 7. STUDY MODE & SAVED TASKS RENDERERS
-        // =========================================================================
-        function renderStudyTasks() {
-            const levelFilter = document.getElementById('filter-study-level').value;
-            const topicFilter = document.getElementById('filter-study-topic').value;
-            const typeFilter = document.getElementById('filter-study-type').value;
-
-            const filtered = TASKS_DB.filter(task => {
-                if (levelFilter !== 'all' && task.level !== levelFilter) return false;
-                if (topicFilter !== 'all' && task.topic !== topicFilter) return false;
-                if (typeFilter !== 'all' && task.type !== typeFilter) return false;
-                return true;
-            });
-
-            document.getElementById('study-task-count').innerText = filtered.length;
-
-            const container = document.getElementById('study-tasks-list');
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-400">
-                        <i class="fa-solid fa-folder-open text-4xl mb-2"></i>
-                        <p>Brak zadań spełniających wybrane kryteria.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = filtered.map((t, idx) => createTaskCardHtml(t, idx + 1)).join('');
-            setTimeout(() => { if (window.renderMathInElement) renderMathInElement(document.body); }, 50);
-        }
-
-        function renderSavedTasks() {
-            const savedTasks = TASKS_DB.filter(t => state.savedTaskIds.includes(t.id));
-            const container = document.getElementById('saved-tasks-list');
-
-            if (savedTasks.length === 0) {
-                container.innerHTML = `
-                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 text-center text-slate-400 border border-slate-200 dark:border-slate-700">
-                        <i class="fa-solid fa-bookmark text-4xl mb-3 text-slate-300 dark:text-slate-600"></i>
-                        <p class="font-semibold">Nie masz jeszcze zapisanych zadań.</p>
-                        <p class="text-xs mt-1">Kliknij ikonę zakładki przy dowolnym zadaniu, aby dodać je do powtórek.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = savedTasks.map((t, idx) => createTaskCardHtml(t, idx + 1)).join('');
-            setTimeout(() => { if (window.renderMathInElement) renderMathInElement(document.body); }, 50);
-        }
-
-        // =========================================================================
-        // 8. EXAM GENERATOR & TIMED SESSION
-        // =========================================================================
-        function startExam() {
-            const level = document.querySelector('input[name="exam-level"]:checked').value;
-            const limit = parseInt(document.getElementById('exam-task-limit').value);
-
-            const available = TASKS_DB.filter(t => t.level === level);
-            // Shuffle
-            const shuffled = [...available].sort(() => 0.5 - Math.random()).slice(0, limit);
-
-            document.getElementById('exam-badge-level').innerText = level;
-            document.getElementById('active-exam-container').classList.remove('hidden');
-
-            const container = document.getElementById('exam-tasks-list');
-            container.innerHTML = shuffled.map((t, idx) => createTaskCardHtml(t, idx + 1)).join('');
-
-            // Timer
-            let seconds = 0;
-            if (state.examState && state.examState.timerInterval) {
-                clearInterval(state.examState.timerInterval);
-            }
-
-            const timerEl = document.getElementById('exam-timer');
-            const timerInterval = setInterval(() => {
-                seconds++;
-                const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-                const secs = (seconds % 60).toString().padStart(2, '0');
-                timerEl.innerText = `${mins}:${secs}`;
-            }, 1000);
-
-            state.examState = { tasks: shuffled, timerInterval: timerInterval };
-            setTimeout(() => { if (window.renderMathInElement) renderMathInElement(document.body); }, 50);
-            window.scrollTo({ top: document.getElementById('active-exam-container').offsetTop - 100, behavior: 'smooth' });
-        }
-
-        function finishExam() {
-            if (state.examState && state.examState.timerInterval) {
-                clearInterval(state.examState.timerInterval);
-            }
-            alert("Arkusz został zakończony. Twoje odpowiedzi zostały zapisane w podsumowaniu!");
-        }
-
-        // =========================================================================
-        // 9. SCRATCHPAD (CANVAS DRAWING)
-        // =========================================================================
-        let canvas, ctx, isDrawing = false;
-
-        function initScratchpad() {
-            canvas = document.getElementById('scratchpadCanvas');
-            ctx = canvas.getContext('2d');
-
-            function resizeCanvas() {
-                canvas.width = canvas.parentElement.clientWidth;
-                canvas.height = canvas.parentElement.clientHeight;
-                ctx.strokeStyle = '#22c55e';
-                ctx.lineWidth = 2.5;
-                ctx.lineCap = 'round';
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-
-            // Mouse events
-            canvas.addEventListener('mousedown', (e) => { isDrawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
-            canvas.addEventListener('mousemove', (e) => { if (isDrawing) { ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); } });
-            canvas.addEventListener('mouseup', () => isDrawing = false);
-
-            // Touch events
-            canvas.addEventListener('touchstart', (e) => {
-                const rect = canvas.getBoundingClientRect();
-                isDrawing = true;
-                ctx.beginPath();
-                ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
-            });
-            canvas.addEventListener('touchmove', (e) => {
-                if (isDrawing) {
-                    const rect = canvas.getBoundingClientRect();
-                    ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
-                    ctx.stroke();
-                }
-            });
-            canvas.addEventListener('touchend', () => isDrawing = false);
-        }
-
-        function toggleScratchpad() {
-            const modal = document.getElementById('scratchpad-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                setTimeout(initScratchpad, 50);
-            }
-        }
-
-        function clearScratchpad() {
-            if (ctx && canvas) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
-        // =========================================================================
-        // 10. MODALS & THEME TOGGLE
-        // =========================================================================
-        function openFormulasModal() {
-            document.getElementById('formulas-modal').classList.remove('hidden');
-            setTimeout(() => { if (window.renderMathInElement) renderMathInElement(document.getElementById('formulas-modal')); }, 50);
-        }
-
-        function closeFormulasModal() {
-            document.getElementById('formulas-modal').classList.add('hidden');
-        }
-
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            const icon = document.getElementById('theme-icon');
-            if (document.documentElement.classList.contains('dark')) {
-                icon.className = 'fa-solid fa-sun text-amber-400';
-            } else {
-                icon.className = 'fa-solid fa-moon text-slate-600';
-            }
-        }
-
-        // Initialize App on DOM ready
-        window.onload = function() {
-            loadState();
-            renderDashboard();
-        };
-    </script>
+      };
+      reader.readAsText(file);
+    }
+
+    // Brudnopis / Rysownica
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+
+    function toggleScratchpad() {
+      document.getElementById('scratchpad').classList.toggle('open');
+    }
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e) {
+      if (!drawing) return;
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = document.getElementById('brush-color').value;
+
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Inicjalizacja
+    renderCategories();
+  </script>
 </body>
 </html>
