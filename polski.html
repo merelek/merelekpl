@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matura Ustna Polski 2027 - Baza Pytań</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Niestandardowy, ciemny scrollbar dla estetyki */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #171717; }
+        ::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #525252; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0a0a0a',
+                        card: '#171717',
+                        accent: '#34d399' // Szmaragdowy akcent
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark text-neutral-300 min-h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Przycisk mobilny do otwierania menu -->
+    <div class="md:hidden bg-card border-b border-neutral-800 p-4 flex justify-between items-center z-20 relative">
+        <h1 class="text-white font-bold text-lg">Matura Ustna '27</h1>
+        <button id="menu-btn" class="text-neutral-400 hover:text-white focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+
+    <!-- Sidebar / Pasek boczny -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out z-10 w-72 bg-card border-r border-neutral-800 flex flex-col h-[calc(100vh-60px)] md:h-screen">
+        <div class="p-5 border-b border-neutral-800 hidden md:block">
+            <h1 class="text-white font-bold text-xl tracking-tight">Matura Ustna '27</h1>
+            <p class="text-xs text-neutral-500 mt-1 uppercase tracking-wider">Baza 76 pytań jawnych</p>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-3 space-y-4" id="questions-list">
+            <!-- Tutaj JS wygeneruje listę pytań pogrupowaną po epokach -->
+        </div>
+    </aside>
+
+    <!-- Główny kontent / Panel pytania -->
+    <main class="flex-1 flex flex-col h-[calc(100vh-60px)] md:h-screen overflow-y-auto bg-dark p-6 md:p-12 relative w-full">
+        <!-- Overlay dla urządzeń mobilnych przy otwartym menu -->
+        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-0 hidden md:hidden"></div>
+        
+        <div class="max-w-4xl mx-auto w-full z-10" id="content-area">
+            <div class="text-center mt-20 text-neutral-500">
+                Wybierz pytanie z listy po lewej stronie, aby wyświetlić opracowanie.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- BAZA DANYCH PYTAŃ ---
+        const questionsData = [
+            // PYTANIE 1 - PEŁNE OPRACOWANIE W PUNKTACH
+            {
+                id: 1, 
+                era: "Starożytność", 
+                title: "1. Motyw cierpienia niezawinionego.",
+                source: "Księga Hioba",
+                sections: [
+                    {
+                        number: 1,
+                        title: "Wstęp",
+                        badgeColor: "bg-blue-600",
+                        bullets: [
+                            "Cierpienie to nieodłączny element ludzkiego życia, który towarzyszy nam od zarania dziejów.",
+                            "Przyjmuje najróżniejsze formy – od bólu fizycznego, przez braki materialne (jak głód), aż po głęboki ból psychiczny po utracie kogoś bliskiego.",
+                            "Choć często bywa naturalną konsekwencją złych decyzji, literatura pokazuje, że równie często jest to cierpienie całkowicie niezawinione, stanowiące dla człowieka tajemnicę."
+                        ]
+                    },
+                    {
+                        number: 2,
+                        title: "Rozwinięcie – Księga Hioba",
+                        badgeColor: "bg-emerald-600",
+                        bullets: [
+                            "Hiob jest przykładem człowieka prawego, bogobojnego i nieskazitelnego.",
+                            "Zostaje wystawiony przez Boga na potężną próbę – traci cały majątek, wszystkie dzieci, a na koniec zapada na trąd.",
+                            "Choć Hiob nie potrafi zrozumieć przyczyny swojego bólu, to ostatecznie nie odwraca się od Boga i zachowuje do Niego zaufanie."
+                        ]
+                    },
+                    {
+                        number: 3,
+                        title: "Kontekst – „Treny” Jana Kochanowskiego",
+                        badgeColor: "bg-purple-600",
+                        bullets: [
+                            "Podobny obraz niezawinionego bólu odnajdujemy w cyklu „Trenów”.",
+                            "Poeta cierpi po przedwczesnej śmierci małej córki, Urszulki – to tragedia, na którą niczym sobie nie zasłużył.",
+                            "Renesansowy twórca, podobnie jak biblijny Hiob, przechodzi przez bunt i załamanie światopoglądu, ale ostatecznie godzi się z losem."
+                        ]
+                    },
+                    {
+                        number: 4,
+                        title: "Podsumowanie",
+                        badgeColor: "bg-amber-600",
+                        bullets: [
+                            "Niezawinione cierpienie pozostaje dla człowieka czymś niezrozumiałym, jednak postawy Hioba i Kochanowskiego udowadniają, że może ono stanowić życiową próbę, która ostatecznie uczy pokory i umacnia wiarę."
+                        ]
+                    }
+                ]
+            },
+            
+            // POZOSTAŁE PYTANIA
+            { id: 2, era: "Starożytność", title: "2. Człowiek wobec niestałości świata.", source: "Księga Koheleta" },
+            { id: 3, era: "Starożytność", title: "3. Wizja końca świata.", source: "Apokalipsa św. Jana" },
+            { id: 4, era: "Starożytność", title: "4. Poświęcenie się w imię wyższych wartości.", source: "Mitologia (Mit o Prometeuszu)" },
+            { id: 5, era: "Starożytność", title: "5. Problematyka winy i kary.", source: "Mitologia (Mit o Syzyfie)" },
+            { id: 6, era: "Starożytność", title: "6. Miłość silniejsza niż śmierć.", source: "Mitologia (Mit o Orfeuszu i Eurydyce)" },
+            { id: 7, era: "Starożytność", title: "7. Heroizm jako postawa człowieka w zmaganiu się z losem.", source: "Iliada (Homer)" },
+            { id: 8, era: "Starożytność", title: "8. Prawa boskie a prawa ludzkie.", source: "Antygona (Sofokles)" },
+            { id: 9, era: "Starożytność", title: "9. Człowiek wobec przeznaczenia.", source: "Król Edyp (Sofokles)" },
+            { id: 10, era: "Średniowiecze", title: "10. Motyw cierpiącej matki.", source: "Lament świętokrzyski" },
+            { id: 11, era: "Średniowiecze", title: "11. Wizerunek władcy.", source: "Kronika polska (Gall Anonim)" },
+            { id: 12, era: "Średniowiecze", title: "12. Relacje między rycerzem a jego seniorem.", source: "Pieśń o Rolandzie" },
+            { id: 13, era: "Renesans", title: "13. Wizerunek rycerza w literaturze średniowiecza.", source: "Pieśń o Rolandzie" },
+            { id: 14, era: "Renesans", title: "14. Różne postawy wobec śmierci.", source: "Rozmowa Mistrza Polikarpa ze Śmiercią" },
+            { id: 15, era: "Renesans", title: "15. Bóg, świat i człowiek w literaturze renesansowej.", source: "Czego chcesz od nas, Panie (J. Kochanowski)" },
+            { id: 16, era: "Klasycyzm", title: "16. Renesansowa koncepcja życia jako teatru.", source: "Makbet (W. Szekspir)" },
+            { id: 17, era: "Klasycyzm", title: "17. Zmienność i nietrwałość jako cechy ludzkiego losu.", source: "Sonety (M. Sęp Szarzyński)" },
+            { id: 18, era: "Oświecenie", title: "18. Sposoby przeżywania żałoby.", source: "Treny (J. Kochanowski)" },
+            { id: 19, era: "Romantyzm", title: "19. Obowiązki obywatela wobec państwa.", source: "Odprawa posłów greckich (J. Kochanowski)" },
+            { id: 20, era: "Romantyzm", title: "20. Moralna odpowiedzialność za losy ojczyzny.", source: "Dziady cz. III (A. Mickiewicz)" },
+            { id: 21, era: "Romantyzm", title: "21. Koncepcja władcy zbrodniarza.", source: "Makbet (W. Szekspir) / Balladyna (J. Słowacki)" },
+            { id: 22, era: "Romantyzm", title: "22. Tragizm ludzkiego losu.", source: "Kordian (J. Słowacki)" },
+            { id: 23, era: "Romantyzm", title: "23. Obraz zaświatów w literaturze.", source: "Dziady cz. II (A. Mickiewicz)" },
+            { id: 24, era: "Romantyzm", title: "24. Portret sarmaty w literaturze polskiej.", source: "Pan Tadeusz (A. Mickiewicz)" },
+            { id: 25, era: "Romantyzm", title: "25. Funkcje motywów fantastycznych w dziele literackim.", source: "Dziady cz. II lub III (A. Mickiewicz)" },
+            { id: 26, era: "Romantyzm", title: "26. Krytyka ludzkich wad i słabości.", source: "Pan Tadeusz (A. Mickiewicz)" },
+            { id: 27, era: "Romantyzm", title: "27. Podróż jako poszukiwanie prawdy.", source: "Kordian (J. Słowacki)" },
+            { id: 28, era: "Romantyzm", title: "28. Romantyczny bohater wobec wyzwań epoki.", source: "Dziady cz. III / Kordian" },
+            { id: 29, era: "Romantyzm", title: "29. Ludowość i jej funkcje.", source: "Ballady i romanse (A. Mickiewicz)" },
+            { id: 30, era: "Pozytywizm", title: "30. Rola obrzędu w życiu społeczności.", source: "Dziady cz. II (A. Mickiewicz)" },
+            { id: 31, era: "Pozytywizm", title: "31. Miłość jako siła niszcząca lub budująca.", source: "Lalka (B. Prus)" },
+            { id: 32, era: "Pozytywizm", title: "32. Przemiana wewnętrzna bohatera.", source: "Zbrodnia i kara (F. Dostojewski)" },
+            { id: 33, era: "Pozytywizm", title: "33. Różne postawy społeczeństwa wobec zniewolenia.", source: "Dziady cz. III (A. Mickiewicz)" },
+            { id: 34, era: "Pozytywizm", title: "34. Mesjanizm i jego rola w narodowej świadomości.", source: "Dziady cz. III (A. Mickiewicz)" },
+            { id: 35, era: "Pozytywizm", title: "35. Szlacheckie obyczaje i ich znaczenie.", source: "Pan Tadeusz (A. Mickiewicz)" },
+            { id: 36, era: "Pozytywizm", title: "36. Natura i jej rola w życiu człowieka.", source: "Nad Niemnem (E. Orzeszkowa)" },
+            { id: 37, era: "Realizm", title: "37. Rola tradycji w życiu narodu.", source: "Nad Niemnem (E. Orzeszkowa)" },
+            { id: 38, era: "Realizm", title: "38. Różne oblicza patriotyzmu.", source: "Lalka (B. Prus)" },
+            { id: 39, era: "Realizm", title: "39. Motyw zbrodni i kary.", source: "Zbrodnia i kara (F. Dostojewski)" },
+            { id: 40, era: "Realizm", title: "40. Konflikt racji romantycznych z racjonalnymi.", source: "Lalka (B. Prus)" },
+            { id: 41, era: "Realizm", title: "41. Walka klas i rewolucja w literaturze.", source: "Nie-Boska komedia (Z. Krasiński)" },
+            { id: 42, era: "Młoda Polska", title: "42. Wizja przyszłości społeczeństwa.", source: "Wesele (S. Wyspiański)" },
+            { id: 43, era: "Młoda Polska", title: "43. Miasto jako przestrzeń życia ludzkiego.", source: "Lalka (B. Prus) / Zbrodnia i kara" },
+            { id: 44, era: "Młoda Polska", title: "44. Obraz polskiego społeczeństwa w XIX wieku.", source: "Lalka (B. Prus)" },
+            { id: 45, era: "Młoda Polska", title: "45. Praca i jej znaczenie w życiu jednostki.", source: "Ludzie bezdomni (S. Żeromski)" },
+            { id: 46, era: "Młoda Polska", title: "46. Miłość i jej różne oblicza w literaturze XIX wieku.", source: "Lalka (B. Prus)" },
+            { id: 47, era: "Młoda Polska", title: "47. Losy powstańców i pamięć o nich.", source: "Nad Niemnem (E. Orzeszkowa) / Lalka" },
+            { id: 48, era: "XX-lecie", title: "48. Motyw buntu wobec porządku świata.", source: "Przedwiośnie (S. Żeromski)" },
+            { id: 49, era: "XX-lecie", title: "49. Wpływ ideologii na losy jednostki.", source: "Inny świat / Rok 1984" },
+            { id: 50, era: "XX-lecie", title: "50. Obraz wsi i społeczności chłopskiej.", source: "Chłopi (W. Reymont)" },
+            { id: 51, era: "XX-lecie", title: "51. Prawa rządzące zbiorowością.", source: "Chłopi (W. Reymont)" },
+            { id: 52, era: "XX-lecie", title: "52. Literacka ocena społeczeństwa polskiego.", source: "Wesele (S. Wyspiański)" },
+            { id: 53, era: "XX-lecie", title: "53. Rola mitów narodowych.", source: "Wesele (S. Wyspiański) / Przedwiośnie" },
+            { id: 54, era: "XX-lecie", title: "54. Inteligencja a chłopi – relacje i konflikty.", source: "Wesele (S. Wyspiański)" },
+            { id: 55, era: "XX-lecie", title: "55. Różne postawy wobec cierpienia i krzywdy innych.", source: "Ludzie bezdomni (S. Żeromski)" },
+            { id: 56, era: "II Wojna", title: "56. Obraz rewolucji i jej skutki.", source: "Przedwiośnie (S. Żeromski) / Nie-Boska komedia" },
+            { id: 57, era: "II Wojna", title: "57. Wizja idealnego państwa a rzeczywistość.", source: "Przedwiośnie (Szklane domy)" },
+            { id: 58, era: "II Wojna", title: "58. Wpływ formy na relacje międzyludzkie.", source: "Ferdydurke (W. Gombrowicz)" },
+            { id: 59, era: "II Wojna", title: "59. Szkoła jako instytucja kształtująca człowieka.", source: "Ferdydurke (W. Gombrowicz) / Syzyfowe prace" },
+            { id: 60, era: "II Wojna", title: "60. Wyobraźnia i sen w kreowaniu rzeczywistości literackiej.", source: "Sklepy cynamonowe (B. Schulz)" },
+            { id: 61, era: "II Wojna", title: "61. Obraz państwa totalitarnego.", source: "Rok 1984 (G. Orwell)" },
+            { id: 62, era: "Egzystencjalizm", title: "62. Motyw winy i odkupienia w realiach systemu totalitarnego.", source: "Inny świat (G. Herling-Grudziński)" },
+            { id: 63, era: "Egzystencjalizm", title: "63. Codzienność i przetrwanie w sowieckich łagrach.", source: "Inny świat (G. Herling-Grudziński)" },
+            { id: 64, era: "Egzystencjalizm", title: "64. Człowiek zlagrowany a uniwersalne wartości moralne.", source: "Opowiadania (T. Borowski)" },
+            { id: 65, era: "Egzystencjalizm", title: "65. Heroizm i godność w obliczu zagłady.", source: "Dżuma (A. Camus) / Zdążyć przed Panem Bogiem" },
+            { id: 66, era: "Współczesność", title: "66. Bunt wobec zła i absurdu otaczającego świata.", source: "Tango (S. Mrożek) / Dżuma" },
+            { id: 67, era: "Współczesność", title: "67. Relacje między jednostką a nieludzkim systemem.", source: "Rok 1984 (G. Orwell) / Inny świat" },
+            { id: 68, era: "Współczesność", title: "68. Konflikt pokoleń i bunt przeciwko tradycji.", source: "Tango (S. Mrożek)" },
+            { id: 69, era: "Współczesność", title: "69. Rola pamięci o wydarzeniach przeszłości.", source: "Miejsce (A. Stasiuk)" },
+            { id: 70, era: "Współczesność", title: "70. Zderzenie różnych cywilizacji i postaw moralnych.", source: "Podróże z Herodotem (R. Kapuściński)" },
+            { id: 71, era: "Współczesność", title: "71. Jednostka w obliczu wielkiej historii.", source: "Zdążyć przed Panem Bogiem (H. Krall)" },
+            { id: 72, era: "Współczesność", title: "72. Refleksja nad uniwersalnymi wartościami i postawami.", source: "Dżuma (A. Camus)" },
+            { id: 73, era: "Współczesność", title: "73. Postawa niezłomna i wierność wyznawanym zasadom.", source: "Pan Cogito (Z. Herbert)" },
+            { id: 74, era: "Współczesność", title: "74. Artysta i sztuka wobec otaczającej rzeczywistości.", source: "Wesele (S. Wyspiański) / Dziady" },
+            { id: 75, era: "Współczesność", title: "75. Funkcja poezji w życiu współczesnego człowieka.", source: "Wiersze wybranych poetów (np. Miłosz, Szymborska)" },
+            { id: 76, era: "Współczesność", title: "76. Złożoność relacji międzyludzkich we współczesnym świecie.", source: "Lalka / Tango / Ferdydurke" }
+        ];
+
+        const sidebarList = document.getElementById('questions-list');
+        const contentArea = document.getElementById('content-area');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const menuBtn = document.getElementById('menu-btn');
+
+        let activeQuestionId = null;
+
+        // Inicjalizacja
+        function init() {
+            renderSidebar();
+            setupMobileMenu();
+        }
+
+        // Renderowanie menu bocznego
+        function renderSidebar() {
+            let currentEra = '';
+            
+            questionsData.forEach(q => {
+                if (q.era !== currentEra) {
+                    const eraHeader = document.createElement('div');
+                    eraHeader.className = 'mt-6 mb-2 first:mt-0';
+                    eraHeader.innerHTML = `<span class="text-xs font-bold text-neutral-500 uppercase tracking-widest pl-2">${q.era}</span>`;
+                    sidebarList.appendChild(eraHeader);
+                    currentEra = q.era;
+                }
+
+                const btn = document.createElement('button');
+                btn.id = `btn-${q.id}`;
+                btn.className = `w-full text-left p-2.5 pl-4 leading-relaxed rounded-md transition-colors duration-200 border-l-2 border-transparent hover:bg-neutral-800 hover:text-white text-neutral-400 group`;
+                
+                // Zmieniona struktura przycisku - dodany tekst źródłowy (źródło lektury)
+                btn.innerHTML = `
+                    <div class="text-xs font-medium text-neutral-300 group-hover:text-white">${q.title}</div>
+                    <div class="text-[10px] mt-1.5 text-neutral-500 uppercase tracking-wide group-hover:text-neutral-400">${q.source}</div>
+                `;
+
+                btn.onclick = () => selectQuestion(q.id);
+                sidebarList.appendChild(btn);
+            });
+        }
+
+        // Akcja po wybraniu pytania
+        function selectQuestion(id) {
+            // Update active state w sidebarze
+            if (activeQuestionId) {
+                const prevBtn = document.getElementById(`btn-${activeQuestionId}`);
+                if (prevBtn) {
+                    prevBtn.classList.remove('bg-neutral-800', 'border-accent');
+                    prevBtn.classList.add('border-transparent');
+                    prevBtn.querySelector('.font-medium').classList.remove('text-white');
+                    prevBtn.querySelector('.font-medium').classList.add('text-neutral-300');
+                }
+            }
+            activeQuestionId = id;
+            const currentBtn = document.getElementById(`btn-${id}`);
+            if (currentBtn) {
+                currentBtn.classList.add('bg-neutral-800', 'border-accent');
+                currentBtn.classList.remove('border-transparent');
+                currentBtn.querySelector('.font-medium').classList.add('text-white');
+                currentBtn.querySelector('.font-medium').classList.remove('text-neutral-300');
+            }
+
+            // Szukanie pytania
+            const q = questionsData.find(item => item.id === id);
+            
+            // Wspólny nagłówek z badge'm tekstu źródłowego
+            const headerHtml = `
+                <div class="mb-8">
+                    <span class="text-accent text-sm font-bold tracking-widest uppercase">${q.era}</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mt-3">${q.title}</h2>
+                    <div class="inline-flex items-center mt-5 px-3 py-1.5 bg-neutral-800/80 border border-neutral-700/50 rounded-md text-sm shadow-sm">
+                        <svg class="w-4 h-4 text-neutral-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        <span class="text-neutral-400 mr-2 font-medium">Lektura:</span>
+                        <span class="text-neutral-200 font-semibold">${q.source}</span>
+                    </div>
+                </div>
+            `;
+
+            // Generowanie widoku treści w oparciu o nową strukturę sekcji
+            if (q.sections && q.sections.length > 0) {
+                const sectionsHtml = q.sections.map(sec => `
+                    <div class="bg-card p-6 rounded-lg border border-neutral-800 shadow-sm relative overflow-hidden">
+                        <!-- Lewy kolorowy pasek -->
+                        <div class="absolute top-0 left-0 w-1.5 h-full ${sec.badgeColor}"></div>
+                        
+                        <!-- Nagłówek sekcji z badge'm -->
+                        <div class="flex items-center gap-4 mb-5 ml-2">
+                            <span class="flex items-center justify-center min-w-[2rem] w-8 h-8 rounded-full ${sec.badgeColor} text-white font-bold text-sm shadow-md">
+                                ${sec.number}
+                            </span>
+                            <h3 class="text-white font-bold text-xl tracking-wide">${sec.title}</h3>
+                        </div>
+                        
+                        <!-- Lista punktowana -->
+                        <ul class="list-disc space-y-3 text-neutral-300 ml-10 mr-2 marker:text-neutral-600">
+                            ${sec.bullets.map(bullet => `
+                                <li class="pl-1 leading-relaxed">${bullet}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `).join('');
+
+                contentArea.innerHTML = `
+                    ${headerHtml}
+                    <div class="space-y-6">
+                        ${sectionsHtml}
+                    </div>
+                `;
+            } else {
+                // Placeholder dla pytań bez wypełnionych sekcji
+                contentArea.innerHTML = `
+                    ${headerHtml}
+                    <div class="bg-card p-8 rounded-lg border border-neutral-800 border-dashed text-center">
+                        <svg class="w-12 h-12 text-neutral-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <h3 class="text-white text-lg font-bold mb-2">Treść w przygotowaniu</h3>
+                        <p class="text-neutral-500 text-sm">Zarysy argumentacji i kontekstów dla <span class="text-white">${q.source}</span> zostaną dodane wkrótce.</p>
+                    </div>
+                `;
+            }
+
+            // Na mobilkach schowaj sidebar po kliknięciu
+            if (window.innerWidth < 768) {
+                toggleMenu();
+            }
+        }
+
+        // Obsługa menu mobilnego
+// 
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
