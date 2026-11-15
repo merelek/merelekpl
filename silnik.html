@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sterowanie Silnikiem</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+  <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 w-full max-w-md shadow-xl">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-xl font-bold">Sterowanie Silnikiem</h1>
+      <span id="status" class="text-xs font-medium px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400">
+        Łączenie...
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <button 
+        onmousedown="sendCmd('ccw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
+        ontouchstart="sendCmd('ccw'); event.preventDefault();" ontouchend="sendCmd('stop')"
+        class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-6 rounded-xl select-none transition cursor-pointer">
+        &larr; W LEWO
+      </button>
+
+      <button 
+        onmousedown="sendCmd('cw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
+        ontouchstart="sendCmd('cw'); event.preventDefault();" ontouchend="sendCmd('stop')"
+        class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-6 rounded-xl select-none transition cursor-pointer">
+        W PRAWO &rarr;
+      </button>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="index.html" class="text-sm text-zinc-400 hover:text-white transition">&larr; Powrót na stronę główną</a>
+    </div>
+  </div>
+
+  <script>
+    // TEN SAM TEMAT CO W PICO W:
+    const MOTOR_TOPIC = "merelek/silnik/k9x82mQ74pL19z/ruch";
+    const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+    let lastCmd = "stop";
+
+    client.on("connect", () => {
+      const statusEl = document.getElementById("status");
+      statusEl.innerText = "Online";
+      statusEl.className = "text-xs font-medium px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400";
+    });
+
+    function sendCmd(cmd) {
+      if (cmd === lastCmd) return;
+      lastCmd = cmd;
+      client.publish(MOTOR_TOPIC, cmd);
+    }
+  </script>
+
+</body>
+</html>
