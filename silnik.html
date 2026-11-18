@@ -92,10 +92,9 @@
 
     client.on("message", (topic, message) => {
       if (topic === TOPIC_STATUS) {
-        const rawPct = parseInt(message.toString(), 10);
-        if (!isNaN(rawPct)) {
-          // Odwrócenie wartości (100 - rawPct), aby 0% nadal oznaczało otwartą, a 100% zamkniętą
-          updateVisual(100 - rawPct);
+        const pct = parseInt(message.toString(), 10);
+        if (!isNaN(pct)) {
+          updateVisual(pct);
         }
       }
     });
