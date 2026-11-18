@@ -23,52 +23,74 @@
 
     <!-- Poglądowa wizualizacja okna i rolety -->
     <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-5 mb-6 flex flex-col items-center">
-      <!-- Kaseta rolety na górze -->
       <div class="w-48 h-3 bg-zinc-700 rounded-t-md shadow"></div>
       
-      <!-- Rama okienna -->
       <div class="relative w-44 h-56 border-4 border-zinc-700 bg-gradient-to-b from-sky-900/40 to-indigo-950/40 overflow-hidden shadow-inner">
-        <!-- Szprosy okna w tle -->
         <div class="absolute inset-y-0 left-1/2 w-1 bg-zinc-700/60 -translate-x-1/2"></div>
         <div class="absolute inset-x-0 top-1/2 h-1 bg-zinc-700/60 -translate-y-1/2"></div>
 
-        <!-- Materiał rolety (wysokość sterowana przez JS w %) -->
         <div id="blind-fabric" style="height: 0%;" class="relative w-full bg-zinc-800 border-b-4 border-zinc-500 transition-all duration-150 ease-out flex flex-col justify-end">
-          <!-- Delikatne prążki materiału -->
           <div class="w-full h-full opacity-20 bg-[repeating-linear-gradient(0deg,transparent,transparent_6px,#000_6px,#000_7px)]"></div>
         </div>
       </div>
 
-      <!-- Parapet -->
       <div class="w-52 h-2.5 bg-zinc-700 rounded-b-md"></div>
 
-      <!-- Licznik procentowy -->
       <div class="mt-4 flex items-baseline gap-1">
         <span id="percent-text" class="text-4xl font-extrabold text-white">0</span>
         <span class="text-lg font-semibold text-zinc-400">% zasłonięcia</span>
       </div>
     </div>
 
-    <!-- Przyciski sterowania (zamienione cw <-> ccw) -->
-    <div class="grid grid-cols-2 gap-4">
-      <button 
-        id="btn-up"
-        onmousedown="sendCmd('cw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
-        ontouchstart="sendCmd('cw'); event.preventDefault();" ontouchend="sendCmd('stop')"
-        class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-5 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center gap-1">
-        <span class="text-lg">&uarr;</span>
-        <span>OTWÓRZ (0%)</span>
-      </button>
+    <!-- Sekcja przycisków: Ręczne (lewa kolumna) + Automatyczne (prawa kolumna) -->
+    <div class="grid grid-cols-2 gap-3">
+      
+      <!-- Kolumna 1: Sterowanie ręczne (trzymaj) -->
+      <div class="flex flex-col gap-3">
+        <span class="text-[11px] uppercase tracking-wider text-zinc-500 text-center font-semibold">Trzymaj</span>
+        <button 
+          onmousedown="sendManual('cw')" onmouseup="sendManual('stop')" onmouseleave="sendManual('stop')"
+          ontouchstart="sendManual('cw'); event.preventDefault();" ontouchend="sendManual('stop')"
+          class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-4 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center">
+          <span class="text-base">&uarr; OTWÓRZ</span>
+          <span class="text-[11px] text-zinc-400 font-normal">ręcznie</span>
+        </button>
 
-      <button 
-        id="btn-down"
-        onmousedown="sendCmd('ccw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
-        ontouchstart="sendCmd('ccw'); event.preventDefault();" ontouchend="sendCmd('stop')"
-        class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-5 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center gap-1">
-        <span class="text-lg">&darr;</span>
-        <span>ZAMKNIJ (100%)</span>
-      </button>
+        <button 
+          onmousedown="sendManual('ccw')" onmouseup="sendManual('stop')" onmouseleave="sendManual('stop')"
+          ontouchstart="sendManual('ccw'); event.preventDefault();" ontouchend="sendManual('stop')"
+          class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-4 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center">
+          <span class="text-base">&darr; ZAMKNIJ</span>
+          <span class="text-[11px] text-zinc-400 font-normal">ręcznie</span>
+        </button>
+      </div>
+
+      <!-- Kolumna 2: Sterowanie automatyczne (kliknij raz) -->
+      <div class="flex flex-col gap-3">
+        <span class="text-[11px] uppercase tracking-wider text-zinc-500 text-center font-semibold">Kliknij raz</span>
+        <button 
+          onclick="sendAuto('auto_cw')"
+          class="bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-700/50 active:bg-emerald-600 text-emerald-200 font-semibold py-4 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center">
+          <span class="text-base">&uArr; DO KOŃCA</span>
+          <span class="text-[11px] text-emerald-400/80 font-normal">otwórz (0%)</span>
+        </button>
+
+        <button 
+          onclick="sendAuto('auto_ccw')"
+          class="bg-blue-950/60 hover:bg-blue-900/70 border border-blue-700/50 active:bg-blue-600 text-blue-200 font-semibold py-4 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center">
+          <span class="text-base">&dArr; DO KOŃCA</span>
+          <span class="text-[11px] text-blue-400/80 font-normal">zamknij (100%)</span>
+        </button>
+      </div>
+
     </div>
+
+    <!-- Przycisk STOP dla trybu automatycznego -->
+    <button 
+      onclick="sendStop()"
+      class="mt-3 w-full bg-red-950/50 hover:bg-red-900/60 border border-red-800/50 active:bg-red-600 text-red-200 font-semibold py-3 rounded-xl select-none transition cursor-pointer text-sm tracking-wide">
+      &#9632; ZATRZYMAJ RUCH
+    </button>
 
     <div class="mt-6 text-center">
       <a href="index.html" class="text-sm text-zinc-400 hover:text-white transition">&larr; Powrót na stronę główną</a>
@@ -80,7 +102,7 @@
     const TOPIC_STATUS = "merelek/silnik/k9x82mQ74pL19z/status";
 
     const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
-    let lastCmd = "stop";
+    let isHoldingManual = false;
 
     client.on("connect", () => {
       const statusEl = document.getElementById("status");
@@ -116,10 +138,25 @@
       }
     }
 
-    function sendCmd(cmd) {
-      if (cmd === lastCmd) return;
-      lastCmd = cmd;
+    function sendManual(cmd) {
+      if (cmd === "stop") {
+        if (!isHoldingManual) return; // Ignoruj onmouseleave jeśli nie trzymano przycisku
+        isHoldingManual = false;
+        client.publish(TOPIC_CMD, "stop");
+      } else {
+        isHoldingManual = true;
+        client.publish(TOPIC_CMD, cmd);
+      }
+    }
+
+    function sendAuto(cmd) {
+      isHoldingManual = false;
       client.publish(TOPIC_CMD, cmd);
+    }
+
+    function sendStop() {
+      isHoldingManual = false;
+      client.publish(TOPIC_CMD, "stop");
     }
   </script>
 
