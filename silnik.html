@@ -49,12 +49,12 @@
       </div>
     </div>
 
-    <!-- Przyciski sterowania -->
+    <!-- Przyciski sterowania (zamienione cw <-> ccw) -->
     <div class="grid grid-cols-2 gap-4">
       <button 
         id="btn-up"
-        onmousedown="sendCmd('ccw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
-        ontouchstart="sendCmd('ccw'); event.preventDefault();" ontouchend="sendCmd('stop')"
+        onmousedown="sendCmd('cw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
+        ontouchstart="sendCmd('cw'); event.preventDefault();" ontouchend="sendCmd('stop')"
         class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-5 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center gap-1">
         <span class="text-lg">&uarr;</span>
         <span>OTWÓRZ (0%)</span>
@@ -62,8 +62,8 @@
 
       <button 
         id="btn-down"
-        onmousedown="sendCmd('cw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
-        ontouchstart="sendCmd('cw'); event.preventDefault();" ontouchend="sendCmd('stop')"
+        onmousedown="sendCmd('ccw')" onmouseup="sendCmd('stop')" onmouseleave="sendCmd('stop')"
+        ontouchstart="sendCmd('ccw'); event.preventDefault();" ontouchend="sendCmd('stop')"
         class="bg-zinc-800 hover:bg-zinc-700 active:bg-blue-600 text-white font-semibold py-5 rounded-xl select-none transition cursor-pointer flex flex-col items-center justify-center gap-1">
         <span class="text-lg">&darr;</span>
         <span>ZAMKNIJ (100%)</span>
@@ -87,15 +87,15 @@
       statusEl.innerText = "Online";
       statusEl.className = "text-xs font-medium px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400";
       
-      // Subskrybuj kanał zwrotny z procentami
       client.subscribe(TOPIC_STATUS);
     });
 
     client.on("message", (topic, message) => {
       if (topic === TOPIC_STATUS) {
-        const pct = parseInt(message.toString(), 10);
-        if (!isNaN(pct)) {
-          updateVisual(pct);
+        const rawPct = parseInt(message.toString(), 10);
+        if (!isNaN(rawPct)) {
+          // Odwrócenie wartości (100 - rawPct), aby 0% nadal oznaczało otwartą, a 100% zamkniętą
+          updateVisual(100 - rawPct);
         }
       }
     });
